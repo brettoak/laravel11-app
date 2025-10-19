@@ -30,6 +30,7 @@ services:
       MYSQL_DATABASE: laravel
     volumes:
       - dbdata:/var/lib/mysql
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
