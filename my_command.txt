@@ -1,5 +1,6 @@
 mysql:
 docker compose exec mysql mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root'; FLUSH PRIVILEGES;"
 
+
 php:
 docker compose exec app php -S 0.0.0.0:8000 -t public
