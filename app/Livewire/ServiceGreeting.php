@@ -7,7 +7,7 @@ use Livewire\Component;
 class ServiceGreeting extends Component
 {
     public $count = 0;
-    public $message = 'Hello from Livewire!';
+    public $message = 'Hello from Livewire with Hot Reload! 🚀';
 
     public function increment()
     {

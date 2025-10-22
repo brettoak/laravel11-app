@@ -1,0 +1,21 @@
+FROM node:18-alpine
+
+WORKDIR /var/www/html
+
+# 复制 package.json 和 package-lock.json
+COPY package*.json ./
+
+# 删除可能存在的 node_modules 和 package-lock.json
+RUN rm -rf node_modules package-lock.json
+
+# 安装依赖
+RUN npm install
+
+# 复制项目文件
+COPY . .
+
+# 暴露 Vite 开发服务器端口
+EXPOSE 5173
+
+# 启动 Vite 开发服务器
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
