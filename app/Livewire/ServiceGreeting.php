@@ -2,17 +2,20 @@
 
 namespace App\Livewire;
 
+use Illuminate\View\View;
+use Livewire\Attributes\Renderless;
 use Livewire\Component;
 
 class ServiceGreeting extends Component
 {
-    public $count = 0;
-    public $message = 'Hello from Livewire with Hot Reload! 🚀';
-
+    public int $count = 0;
+    public string $message = 'Hello from Livewire with Hot Reload! 🚀';
+    public string $message1 = 'Hello from Livewire with Hot Reload! 🚀';
     public array $greetings = [];
     public array $statuses = [];
 
-    public function mount(): void{
+    public function mount(): void
+    {
 
         $this->greetings = [
             'text' => 'Hello from Livewire Service Component!',
@@ -25,17 +28,16 @@ class ServiceGreeting extends Component
         ];
     }
 
-    public function increment()
+    public function increment() :int
     {
         $this->count++;
     }
-
-    public function refresh()
+    public function refresh() : void
     {
-        $this->message = 'Refreshed at ' . now()->format('H:i:s');
+        $this->message = 'Hi: Refreshed at ' . now()->format('H:i:s');
     }
 
-    public function render()
+    public function render() : View
     {
         return view('livewire.service-greeting');
     }
