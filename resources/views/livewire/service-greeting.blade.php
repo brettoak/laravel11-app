@@ -8,10 +8,10 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($greetings as $service => $message)
+            @foreach($greetings as $service => $vv)
                 <tr class="hover:bg-red-700 text-3xl">
                     <td class="border border-red-600 text-cyan-400 px-32">{{ $service }}</td>
-                    <td class="border border-red-600 text-cyan-400 px-32">{{ $message }}</td>
+                    <td class="border border-red-600 text-cyan-400 px-32">{{ $vv }}</td>
                 </tr>
             @endforeach
             </tbody>
