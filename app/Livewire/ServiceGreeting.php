@@ -13,6 +13,7 @@ class ServiceGreeting extends Component
     public string $message1 = 'Hello from Livewire with Hot Reload! 🚀';
     public array $greetings = [];
     public array $statuses = [];
+    public bool $show = false;
 
     public function mount(): void
     {
@@ -35,6 +36,12 @@ class ServiceGreeting extends Component
     public function refresh() : void
     {
         $this->message = 'Hi: Refreshed at ' . now()->format('H:i:s');
+        $this->show = true;
+    }
+
+    public function closeModal(): void
+    {
+        $this->show = false;
     }
 
     public function render() : View
