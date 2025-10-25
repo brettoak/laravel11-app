@@ -13,6 +13,7 @@
 <body>
 <livewire:service-greeting />
 <livewire:service-greeting2 />
+<livewire:service-greeting3 />
 @livewireScripts
 </body>
 </html>

@@ -1,12 +1,14 @@
 import './bootstrap';
-import 'alpinejs'
+import Alpine from 'alpinejs';
+import { createGrid, ModuleRegistry, AllCommunityModule, themeQuartz } from 'ag-grid-community';
 
-import { Grid, ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+// 注册所有社区版模块
+ModuleRegistry.registerModules([AllCommunityModule]);
 
-// 注册模块
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+window.Alpine = Alpine;
+window.createGrid = createGrid;
+window.themeQuartz = themeQuartz; // 导出主题
 
-window.agGrid = { Grid };
 
+
+Alpine.start();
