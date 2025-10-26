@@ -15,6 +15,7 @@
 <livewire:service-greeting2 />
 <livewire:service-greeting3 />
 <livewire:service-greeting4 />
+<livewire:service-greeting5 />
 @livewireScripts
 </body>
 </html>
