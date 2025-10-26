@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
+
         User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',

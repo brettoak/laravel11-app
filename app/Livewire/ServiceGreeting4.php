@@ -25,9 +25,9 @@ class ServiceGreeting4 extends Component
             ->get()
             ->pluck('article')
             ->unique('id')
-            ->filter(fn ($a) => $a->views > 100)      // 筛选热门
+            ->filter(fn($a) => $a->views > 100)      // 筛选热门
             ->sortByDesc('views')                      // 按热度排序
-            ->map(fn ($a) => [                        // 转换格式
+            ->map(fn($a) => [                        // 转换格式
                 'title111' => $a->title,
                 'views' => $a->views,
                 'label' => $a->views > 110 ? '✨爆款' : '🔥热门',
@@ -45,19 +45,9 @@ class ServiceGreeting4 extends Component
                     ->unique('id')
             )
             ->unique('id')                               // 再去重
-            ->filter(fn ($a) => $a->views > 100)        // 筛选热门
+            ->filter(fn($a) => $a->views > 100)        // 筛选热门
             ->toArray();
-
-        $queries = DB::getQueryLog();
-//        dd($hotArticles);
-        echo "<pre>";
-        print_r($allArticles);die();
-
-        dump($articles->toSql());
-
     }
-
-
 
 
     public function render(): View
