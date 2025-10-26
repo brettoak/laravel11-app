@@ -58,6 +58,7 @@ return [
     */
 
     'features' => [
+        // Features::registration(),
         // Features::termsAndPrivacyPolicy(),
         // Features::profilePhotos(),
         // Features::api(),
