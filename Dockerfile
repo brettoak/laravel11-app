@@ -7,11 +7,12 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libicu-dev \
     zip \
     unzip \
     nginx \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql gd exif pcntl bcmath opcache \
+    && docker-php-ext-install pdo_mysql gd exif pcntl bcmath opcache intl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
