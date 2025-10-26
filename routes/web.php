@@ -28,3 +28,12 @@ Route::get('/test2', static function () {
 
 
 Route::get('/service', [ServiceController::class, 'index']);
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+});
