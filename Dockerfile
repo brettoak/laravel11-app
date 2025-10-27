@@ -61,8 +61,23 @@ RUN cp /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 # 设置工作目录
 WORKDIR /var/www/html
 
+# 复制 composer 文件
+COPY composer.json composer.lock ./
+
+# 设置 Composer 环境变量
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_NO_INTERACTION=1
+
+# 复制项目文件（先复制必要的文件）
+COPY . .
+
+# 安装 Composer 依赖
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+
 # 设置权限
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
 # 创建启动脚本
 RUN echo '#!/bin/bash\n\
