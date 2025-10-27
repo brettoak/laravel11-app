@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReverbTest;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 
@@ -28,10 +29,6 @@ Route::get('/test2', static function () {
 });
 
 
-
-
-
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -42,4 +39,6 @@ Route::middleware([
     })->name('dashboard');
 
     Route::get('/service', [ServiceController::class, 'index']);
+
+    Route::get('/reverb-test', [ReverbTest::class, 'index']);
 });
