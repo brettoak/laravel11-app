@@ -1,3 +1,150 @@
-<div>
-<h1 class="">  this is a test page </h1>
+<div class="max-w-4xl mx-auto p-6">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Job 进度实时监控演示</h2>
+
+        <!-- 任务信息卡片 -->
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <span class="text-sm text-gray-600">任务 ID:</span>
+                    <p class="text-sm font-mono text-gray-800">{{ $taskId ?? '未开始' }}</p>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-600">状态:</span>
+                    <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold {{ $isRunning ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800' }}">
+                        {{ $isRunning ? '运行中' : '空闲' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 进度条 -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-semibold text-gray-700">进度</span>
+                    <span class="text-sm font-semibold text-gray-700">{{ number_format($progress, 1) }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                    <div
+                        class="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-500 ease-out rounded-full flex items-center justify-center"
+                        style="width: {{ $progress }}%"
+                    >
+                        @if($progress > 0 && $progress < 100)
+                            <span class="text-xs text-white font-bold">{{ $currentStep }}/{{ $totalSteps }}</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- 状态消息 -->
+            <div class="p-3 bg-white rounded border border-gray-200">
+                <span class="text-sm text-gray-600">当前状态:</span>
+                <p class="text-sm font-semibold text-gray-800 mt-1">{{ $message }}</p>
+            </div>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="flex gap-4">
+            @if(!$isRunning)
+                <button
+                    wire:click="startTask"
+                    class="px-6 py-3 bg-green-600 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                >
+                    启动任务
+                </button>
+            @else
+                <button
+                    disabled
+                    class="px-6 py-3 bg-amber-500 text-white rounded-lg font-semibold cursor-not-allowed shadow-md border-2 border-amber-600 opacity-90"
+                >
+                    ⏳ 任务运行中...
+                </button>
+            @endif
+
+            @if($taskId)
+                <button
+                    wire:click="resetTask"
+                    class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                    重置
+                </button>
+            @endif
+        </div>
+
+        <!-- 步骤列表 -->
+        @if($taskId)
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-3 text-gray-800">执行步骤</h3>
+                <div class="space-y-2">
+                    @for($i = 1; $i <= $totalSteps; $i++)
+                        <div class="flex items-center gap-3 p-2 rounded {{ $i <= $currentStep ? 'bg-green-50 border border-green-200' : ($i == $currentStep + 1 && $isRunning ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50') }}">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-semibold text-xs
+                                {{ $i < $currentStep ? 'bg-green-500 text-white' : ($i == $currentStep ? 'bg-yellow-500 text-white animate-pulse' : 'bg-gray-300 text-gray-600') }}">
+                                @if($i < $currentStep)
+                                    ✓
+                                @elseif($i == $currentStep && $isRunning)
+                                    ⟳
+                                @else
+                                    {{ $i }}
+                                @endif
+                            </div>
+                            <span class="text-sm {{ $i <= $currentStep ? 'text-green-800 font-semibold' : ($i == $currentStep + 1 && $isRunning ? 'text-yellow-800' : 'text-gray-600') }}">
+                                步骤 {{ $i }}: {{ $i <= $currentStep ? '已完成' : ($i == $currentStep + 1 && $isRunning ? '执行中...' : '等待中') }}
+                            </span>
+                        </div>
+                    @endfor
+                </div>
+            </div>
+        @endif
+    </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 确保 Echo 已初始化
+        if (typeof Echo !== 'undefined' && typeof Livewire !== 'undefined') {
+            let channel = null;
+
+            // 监听 Livewire 事件来启动/停止监听
+            window.Livewire.on('task-started', (event) => {
+                const taskId = event[0] || event.taskId;
+
+                // 断开之前的连接
+                if (channel) {
+                    Echo.leave(channel.name);
+                }
+
+                // 监听新任务的进度更新
+                channel = Echo.private(`task-progress.${taskId}`)
+                    .listen('.progress.updated', (data) => {
+                        console.log('收到进度更新:', data);
+
+                        // 更新 Livewire 组件
+                        @this.set('currentStep', data.currentStep);
+                        @this.set('progress', data.progress);
+                        @this.set('message', data.message);
+
+                        // 如果任务完成，设置运行状态为 false
+                        if (data.progress >= 100) {
+                            setTimeout(() => {
+                                @this.set('isRunning', false);
+                            }, 1000);
+                        }
+                    });
+
+                console.log('已连接到任务进度频道:', `task-progress.${taskId}`);
+            });
+
+            // 监听重置事件
+            window.Livewire.on('task-reset', () => {
+                if (channel) {
+                    Echo.leave(channel.name);
+                    channel = null;
+                }
+            });
+        } else {
+            console.error('Echo 或 Livewire 未初始化，请确保已正确配置 WebSocket 连接');
+        }
+    });
+</script>
+@endpush
