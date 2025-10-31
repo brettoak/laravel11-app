@@ -16,6 +16,16 @@ services:
       - DB_DATABASE=laravel
       - DB_USERNAME=root
       - DB_PASSWORD=root
+      - REDIS_HOST=my-redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+      - BROADCAST_DRIVER=reverb
+      - REVERB_APP_ID=my-app-id
+      - REVERB_APP_KEY=my-app-key
+      - REVERB_APP_SECRET=my-app-secret
+      - REVERB_HOST=my-reverb
+      - REVERB_PORT=8080
+      - REVERB_SCHEME=http
     networks:
       - my-network
 
@@ -80,9 +90,17 @@ services:
     ports:
       - "8080:8080"
     environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - REDIS_HOST=my-redis
+      - REDIS_PORT=6379
       - REVERB_HOST=0.0.0.0
       - REVERB_PORT=8080
     depends_on:
+      - mysql
       - redis
     networks:
       - my-network

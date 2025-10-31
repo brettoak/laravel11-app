@@ -28,6 +28,9 @@ Route::get('/test2', static function () {
     ]);
 });
 
+// 测试路由 - 不需要认证
+Route::get('/reverb-test-public', [ReverbTest::class, 'index']);
+
 
 Route::middleware([
     'auth:sanctum',
