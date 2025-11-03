@@ -44,4 +44,6 @@ Route::middleware([
     Route::get('/service', [ServiceController::class, 'index']);
 
     Route::get('/reverb-test', [ReverbTest::class, 'index']);
+
+    Route::get('/conversation', [Conversation::class, 'index']);
 });
