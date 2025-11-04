@@ -103,6 +103,46 @@
         // 确保 Echo 已初始化
         if (typeof Echo !== 'undefined' && typeof Livewire !== 'undefined') {
             let channel = null;
+            
+            // 全局监听 Echo 连接的所有事件（用于调试）
+            if (Echo.connector && Echo.connector.pusher) {
+                Echo.connector.pusher.connection.bind('message', (data) => {
+                    // 检查是否是任务进度频道的事件
+                    if (data && data.channel && data.channel.includes('task-progress')) {
+                        console.log('检测到任务进度频道的消息:', {
+                            event: data.event,
+                            channel: data.channel,
+                            data: data.data
+                        });
+                        
+                        // 如果事件名称包含 TaskProgressUpdated，尝试解析数据
+                        if (data.event && (data.event.includes('TaskProgressUpdated') || data.event.includes('progress'))) {
+                            try {
+                                const eventData = typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
+                                console.log('解析出的事件数据:', eventData);
+                                
+                                // 尝试更新组件
+                                const componentElement = document.getElementById('reverb-test-component');
+                                const componentId = componentElement ? componentElement.getAttribute('wire:id') : null;
+                                if (componentId) {
+                                    const component = Livewire.find(componentId);
+                                    if (component && eventData) {
+                                        console.log('从原始消息更新组件:', eventData);
+                                        component.set('currentStep', eventData.currentStep);
+                                        component.set('progress', eventData.progress);
+                                        component.set('message', eventData.message);
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('解析事件数据失败:', e);
+                            }
+                        }
+                    }
+                });
+                Echo.connector.pusher.connection.bind('pusher:error', (error) => {
+                    console.error('Pusher 连接错误:', error);
+                });
+            }
 
             // 监听 Livewire 事件来启动/停止监听
             window.Livewire.on('task-started', (event) => {
@@ -122,34 +162,95 @@
                 console.log('组件 ID:', componentId);
 
                 // 监听新任务的进度更新
-                channel = Echo.private('task-progress.' + taskId)
-                    .listen('.progress.updated', (data) => {
-                        console.log('收到进度更新:', data);
+                const channelName = 'task-progress.' + taskId;
+                channel = Echo.private(channelName);
+                
+                // 更新组件的辅助函数（提前定义，供监听器使用）
+                function updateComponent(data, componentId) {
+                    if (componentId) {
+                        const component = Livewire.find(componentId);
+                        if (component) {
+                            console.log('更新组件状态:', data);
+                            component.set('currentStep', data.currentStep);
+                            component.set('progress', data.progress);
+                            component.set('message', data.message);
 
-                        // 获取组件实例并更新
-                        if (componentId) {
-                            const component = Livewire.find(componentId);
-                            if (component) {
-                                console.log('更新组件状态:', data);
-                                component.set('currentStep', data.currentStep);
-                                component.set('progress', data.progress);
-                                component.set('message', data.message);
-
-                                // 如果任务完成，设置运行状态为 false
-                                if (data.progress >= 100) {
-                                    setTimeout(() => {
-                                        component.set('isRunning', false);
-                                    }, 1000);
-                                }
-                            } else {
-                                console.error('无法找到 Livewire 组件，ID:', componentId);
+                            // 如果任务完成，设置运行状态为 false
+                            if (data.progress >= 100) {
+                                setTimeout(() => {
+                                    component.set('isRunning', false);
+                                }, 1000);
                             }
                         } else {
-                            console.error('组件 ID 为空');
+                            console.error('无法找到 Livewire 组件，ID:', componentId);
                         }
+                    } else {
+                        console.error('组件 ID 为空');
+                    }
+                }
+                
+                // 添加订阅成功和错误回调
+                channel.subscribed(() => {
+                    console.log('频道订阅成功: ' + channelName);
+                    
+                    // 在订阅成功后立即设置监听器
+                    // 尝试多种事件名称格式
+                    const eventListeners = [
+                        '.App.Events.TaskProgressUpdated',
+                        'App.Events.TaskProgressUpdated',
+                        '.App\\Events\\TaskProgressUpdated',
+                        'App\\Events\\TaskProgressUpdated'
+                    ];
+                    
+                    eventListeners.forEach(eventName => {
+                        channel.listen(eventName, (data) => {
+                            console.log('收到进度更新事件 (' + eventName + '):', data);
+                            updateComponent(data, componentId);
+                        });
                     });
+                    
+                    console.log('已设置事件监听器，监听的事件:', eventListeners);
+                });
+                
+                channel.error((error) => {
+                    console.error('频道订阅错误:', error);
+                    if (error && error.message) {
+                        console.error('错误消息:', error.message);
+                    }
+                });
+                
+                // 也在订阅前设置监听器（以防订阅回调延迟）
+                channel.listen('.App.Events.TaskProgressUpdated', (data) => {
+                    console.log('收到进度更新事件 (预监听器):', data);
+                    updateComponent(data, componentId);
+                });
+                
+                // 尝试直接监听 Pusher 频道的所有事件
+                if (channel.pusher && channel.pusher.channel) {
+                    const pusherChannel = channel.pusher.channel;
+                    console.log('Pusher 频道对象:', pusherChannel);
+                    
+                    // 尝试监听所有事件（使用 Pusher 的 bind_all 或者直接监听）
+                    // 注意：Pusher 可能没有 bind_global，让我们尝试其他方法
+                    if (pusherChannel.bind) {
+                        // 监听所有可能的事件名称格式
+                        const possibleEventNames = [
+                            'App\\Events\\TaskProgressUpdated',
+                            'App.Events.TaskProgressUpdated',
+                            '.App\\Events\\TaskProgressUpdated',
+                            '.App.Events.TaskProgressUpdated'
+                        ];
+                        
+                        possibleEventNames.forEach(eventName => {
+                            pusherChannel.bind(eventName, (data) => {
+                                console.log('Pusher 频道直接收到事件 (' + eventName + '):', data);
+                                updateComponent(data, componentId);
+                            });
+                        });
+                    }
+                }
 
-                console.log('已连接到任务进度频道: task-progress.' + taskId);
+                console.log('已连接到任务进度频道: ' + channelName);
             });
 
             // 监听重置事件
