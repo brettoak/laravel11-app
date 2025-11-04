@@ -67,13 +67,13 @@ class User extends Authenticatable
     }
 
 
-    // 一个用户有多篇文章
+    // A user has many articles
     public function articles(): HasMany
     {
         return $this->hasMany(Article::class);
     }
 
-    // 一个用户有多条评论
+    // A user has many comments
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);

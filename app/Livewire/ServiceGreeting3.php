@@ -8,9 +8,9 @@ class ServiceGreeting3 extends Component
 {
     public array $columnDefs = [
         ['field' => 'id', 'headerName' => 'ID', 'sortable' => true, 'filter' => true, 'width' => 80],
-        ['field' => 'name', 'headerName' => '姓名', 'sortable' => true, 'filter' => true, 'width' => 150],
-        ['field' => 'email', 'headerName' => '邮箱', 'sortable' => true, 'filter' => true, 'width' => 200],
-        ['field' => 'created_at', 'headerName' => '创建时间', 'sortable' => true, 'filter' => true, 'width' => 1080],
+        ['field' => 'name', 'headerName' => 'Name', 'sortable' => true, 'filter' => true, 'width' => 150],
+        ['field' => 'email', 'headerName' => 'Email', 'sortable' => true, 'filter' => true, 'width' => 200],
+        ['field' => 'created_at', 'headerName' => 'Created At', 'sortable' => true, 'filter' => true, 'width' => 1080],
     ];
 
     public array $tableData = [

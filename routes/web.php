@@ -29,7 +29,7 @@ Route::get('/test2', static function () {
     ]);
 });
 
-// 测试路由 - 不需要认证
+// Test route - no authentication required
 Route::get('/reverb-test-public', [ReverbTest::class, 'index']);
 
 

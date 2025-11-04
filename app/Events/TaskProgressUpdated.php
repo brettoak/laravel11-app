@@ -19,7 +19,7 @@ class TaskProgressUpdated implements ShouldBroadcastNow
     public $message;
 
     /**
-     * 创建一个新的事件实例
+     * Create a new event instance
      */
     public function __construct(
         string $taskId,
@@ -36,7 +36,7 @@ class TaskProgressUpdated implements ShouldBroadcastNow
     }
 
     /**
-     * 获取事件应该广播到的频道
+     * Get the channels the event should broadcast on
      */
     public function broadcastOn(): PrivateChannel
     {
@@ -44,8 +44,8 @@ class TaskProgressUpdated implements ShouldBroadcastNow
     }
 
     /**
-     * 事件的广播名称
-     * 注释掉 broadcastAs() 使用默认事件名称：App\Events\TaskProgressUpdated
+     * The event's broadcast name
+     * Commented out broadcastAs() to use default event name: App\Events\TaskProgressUpdated
      */
     // public function broadcastAs(): string
     // {
@@ -53,7 +53,7 @@ class TaskProgressUpdated implements ShouldBroadcastNow
     // }
 
     /**
-     * 获取要广播的数据
+     * Get the data to broadcast
      */
     public function broadcastWith(): array
     {

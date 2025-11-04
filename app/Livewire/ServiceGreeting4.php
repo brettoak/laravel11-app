@@ -15,7 +15,7 @@ class ServiceGreeting4 extends Component
 
     public function mount(): void
     {
-        // 启用 SQL 查询日志
+        // Enable SQL query logging
         DB::enableQueryLog();
         $this->user = auth()->user();
 
@@ -25,27 +25,27 @@ class ServiceGreeting4 extends Component
             ->get()
             ->pluck('article')
             ->unique('id')
-            ->filter(fn($a) => $a->views > 100)      // 筛选热门
-            ->sortByDesc('views')                      // 按热度排序
-            ->map(fn($a) => [                        // 转换格式
+            ->filter(fn($a) => $a->views > 100)      // Filter popular articles
+            ->sortByDesc('views')                      // Sort by popularity
+            ->map(fn($a) => [                        // Transform format
                 'title111' => $a->title,
                 'views' => $a->views,
-                'label' => $a->views > 110 ? '✨爆款' : '🔥热门',
+                'label' => $a->views > 110 ? '✨Bestseller' : '🔥Popular',
             ])
 //            ->flatten()
             ->toArray();
 
-        $allArticles = $this->user->articles()           // 用户创建的文章
+        $allArticles = $this->user->articles()           // Articles created by user
         ->get()
             ->merge(
-                $this->user->comments()                  // 合并：用户评论过的文章
+                $this->user->comments()                  // Merge: articles commented by user
                 ->with('article')
                     ->get()
                     ->pluck('article')
                     ->unique('id')
             )
-            ->unique('id')                               // 再去重
-            ->filter(fn($a) => $a->views > 100)        // 筛选热门
+            ->unique('id')                               // Remove duplicates
+            ->filter(fn($a) => $a->views > 100)        // Filter popular articles
             ->toArray();
     }
 

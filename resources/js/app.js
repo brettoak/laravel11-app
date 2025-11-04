@@ -1,13 +1,13 @@
 import './bootstrap';
 import { createGrid, ModuleRegistry, AllCommunityModule, themeQuartz } from 'ag-grid-community';
 
-// 注册所有社区版模块
+// Register all community modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-// 导出全局工具函数
+// Export global utility functions
 window.createGrid = createGrid;
-window.themeQuartz = themeQuartz; // 导出主题
+window.themeQuartz = themeQuartz; // Export theme
 
-// 注意：不在这里导入 Alpine.js
-// Livewire 会自动加载并管理 Alpine.js
-// 如果需要在其他地方使用 Alpine，可以通过 window.Alpine 访问（由 Livewire 设置）
+// Note: Do not import Alpine.js here
+// Livewire will automatically load and manage Alpine.js
+// If you need to use Alpine elsewhere, you can access it via window.Alpine (set by Livewire)

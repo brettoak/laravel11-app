@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-# 安装系统依赖和 PHP 扩展
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -16,13 +16,13 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装 Composer
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 配置 PHP-FPM
+# Configure PHP-FPM
 RUN echo "listen = 127.0.0.1:9000" >> /usr/local/etc/php-fpm.d/www.conf
 
-# 配置 Nginx
+# Configure Nginx
 RUN echo 'server {\n\
     listen 80;\n\
     server_name localhost;\n\
@@ -49,46 +49,50 @@ RUN echo 'server {\n\
     }\n\
 }' > /etc/nginx/sites-available/default
 
-# 启用 Nginx 站点配置
+# Enable Nginx site configuration
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# 移除默认的 Nginx 配置
+# Remove default Nginx configuration
 RUN rm -f /etc/nginx/sites-enabled/default
 
-# 复制我们的配置
+# Copy our configuration
 RUN cp /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# 设置工作目录
+# Set working directory
 WORKDIR /var/www/html
 
-# 复制 composer 文件
+# Copy composer files
 COPY composer.json composer.lock ./
 
-# 设置 Composer 环境变量
+# Set Composer environment variables
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_NO_INTERACTION=1
 
-# 复制项目文件（先复制必要的文件）
+# Copy project files
 COPY . .
 
-# 安装 Composer 依赖
+# Install Composer dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
-# 设置权限
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# 创建启动脚本
+# Create startup script
 RUN echo '#!/bin/bash\n\
-# 启动 PHP-FPM\n\
+# Start PHP-FPM\n\
 php-fpm -D\n\
-# 启动 Nginx\n\
+# Start 3 queue workers (run in background)\n\
+for i in {1..3}; do\n\
+    php artisan queue:work --tries=3 --timeout=90 &\n\
+done\n\
+# Start Nginx (run in foreground to keep container alive)\n\
 nginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
 
-# 暴露端口
+# Expose port
 EXPOSE 80
 
-# 启动服务
+# Start services
 CMD ["/start.sh"]
 

@@ -2,7 +2,7 @@
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Job 进度实时监控演示</h2>
 
-        <!-- 任务信息卡片 -->
+        <!-- Task information card -->
         <div class="mb-6 p-4 bg-gray-50 rounded-lg">
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
@@ -17,7 +17,7 @@
                 </div>
             </div>
 
-            <!-- 进度条 -->
+            <!-- Progress bar -->
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-semibold text-gray-700">进度</span>
@@ -35,14 +35,14 @@
                 </div>
             </div>
 
-            <!-- 状态消息 -->
+            <!-- Status message -->
             <div class="p-3 bg-white rounded border border-gray-200">
                 <span class="text-sm text-gray-600">当前状态:</span>
                 <p class="text-sm font-semibold text-gray-800 mt-1">{{ $message }}</p>
             </div>
         </div>
 
-        <!-- 控制按钮 -->
+        <!-- Control buttons -->
         <div class="flex gap-4">
             @if(!$isRunning)
                 <button
@@ -70,7 +70,7 @@
             @endif
         </div>
 
-        <!-- 步骤列表 -->
+        <!-- Steps list -->
         @if($taskId)
             <div class="mt-6">
                 <h3 class="text-lg font-semibold mb-3 text-gray-800">执行步骤</h3>
@@ -100,61 +100,61 @@
 @push('scripts')
 <script>
     document.addEventListener('livewire:init', () => {
-        // 确保 Echo 已初始化
+        // Ensure Echo is initialized
         if (typeof Echo !== 'undefined' && typeof Livewire !== 'undefined') {
             let channel = null;
 
-            // 监听 Livewire 事件来启动/停止监听
+            // Listen to Livewire events to start/stop listening
             window.Livewire.on('task-started', (event) => {
                 const taskId = event[0] || event.taskId;
-                console.log('收到 task-started 事件，任务ID:', taskId);
+                console.log('Received task-started event, task ID:', taskId);
 
-                // 断开之前的连接
+                // Disconnect previous connection
                 if (channel) {
                     Echo.leave(channel.name);
                     channel = null;
                 }
 
-                // 通过 DOM 元素获取组件 ID（在事件触发时获取，确保组件已挂载）
+                // Get component ID via DOM element (get when event is triggered, ensure component is mounted)
                 const componentElement = document.getElementById('reverb-test-component');
                 const componentId = componentElement ? componentElement.getAttribute('wire:id') : null;
                 
-                console.log('组件 ID:', componentId);
+                console.log('Component ID:', componentId);
 
-                // 监听新任务的进度更新
+                // Listen for progress updates of the new task
                 const channelName = 'task-progress.' + taskId;
                 channel = Echo.private(channelName);
                 
-                // 更新组件的辅助函数（提前定义，供监听器使用）
+                // Helper function to update component (defined early, for use by listeners)
                 function updateComponent(data, componentId) {
                     if (componentId) {
                         const component = Livewire.find(componentId);
                         if (component) {
-                            console.log('更新组件状态:', data);
+                            console.log('Updating component state:', data);
                             component.set('currentStep', data.currentStep);
                             component.set('progress', data.progress);
                             component.set('message', data.message);
 
-                            // 如果任务完成，设置运行状态为 false
+                            // If task is completed, set running status to false
                             if (data.progress >= 100) {
                                 setTimeout(() => {
                                     component.set('isRunning', false);
                                 }, 1000);
                             }
                         } else {
-                            console.error('无法找到 Livewire 组件，ID:', componentId);
+                            console.error('Unable to find Livewire component, ID:', componentId);
                         }
                     } else {
-                        console.error('组件 ID 为空');
+                        console.error('Component ID is empty');
                     }
                 }
                 
-                // 添加订阅成功和错误回调
+                // Add subscription success and error callbacks
                 channel.subscribed(() => {
-                    console.log('频道订阅成功: ' + channelName);
+                    console.log('Channel subscription successful: ' + channelName);
                     
-                    // 在订阅成功后立即设置监听器
-                    // 尝试多种事件名称格式
+                    // Set up listeners immediately after subscription success
+                    // Try multiple event name formats
                     const eventListeners = [
                         '.App.Events.TaskProgressUpdated',
                         'App.Events.TaskProgressUpdated',
@@ -164,34 +164,34 @@
                     
                     eventListeners.forEach(eventName => {
                         channel.listen(eventName, (data) => {
-                            console.log('收到进度更新事件 (' + eventName + '):', data);
+                            console.log('Received progress update event (' + eventName + '):', data);
                             updateComponent(data, componentId);
                         });
                     });
                     
-                    console.log('已设置事件监听器，监听的事件:', eventListeners);
+                    console.log('Event listeners set up, listening to events:', eventListeners);
                 });
                 
                 channel.error((error) => {
-                    console.error('频道订阅错误:', error);
+                    console.error('Channel subscription error:', error);
                     if (error && error.message) {
-                        console.error('错误消息:', error.message);
+                        console.error('Error message:', error.message);
                     }
                 });
 
-                console.log('已连接到任务进度频道: ' + channelName);
+                console.log('Connected to task progress channel: ' + channelName);
             });
 
-            // 监听重置事件
+            // Listen to reset event
             window.Livewire.on('task-reset', () => {
                 if (channel) {
                     Echo.leave(channel.name);
                     channel = null;
-                    console.log('已断开任务进度频道连接');
+                    console.log('Disconnected from task progress channel');
                 }
             });
         } else {
-            console.error('Echo 或 Livewire 未初始化，请确保已正确配置 WebSocket 连接');
+            console.error('Echo or Livewire not initialized, please ensure WebSocket connection is properly configured');
         }
     });
 </script>

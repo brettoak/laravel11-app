@@ -18,7 +18,7 @@ class ProcessTaskJob implements ShouldQueue
     public $totalSteps;
 
     /**
-     * 创建一个新的任务实例
+     * Create a new job instance
      */
     public function __construct(string $taskId, int $totalSteps = 10)
     {
@@ -27,19 +27,19 @@ class ProcessTaskJob implements ShouldQueue
     }
 
     /**
-     * 执行任务
+     * Execute the job
      */
     public function handle(): void
     {
-        // 模拟一个耗时的任务，分步骤执行
+        // Simulate a time-consuming task, executed in steps
         for ($currentStep = 1; $currentStep <= $this->totalSteps; $currentStep++) {
-            // 模拟每个步骤的耗时操作
+            // Simulate time-consuming operation for each step
             $this->simulateWork($currentStep);
             
-            // 计算进度百分比
+            // Calculate progress percentage
             $progress = ($currentStep / $this->totalSteps) * 100;
             
-            // 广播进度更新事件
+            // Broadcast progress update event
             event(new TaskProgressUpdated(
                 $this->taskId,
                 $currentStep,
@@ -49,44 +49,44 @@ class ProcessTaskJob implements ShouldQueue
             ));
         }
         
-        // 任务完成
+        // Task completed
         event(new TaskProgressUpdated(
             $this->taskId,
             $this->totalSteps,
             $this->totalSteps,
             100,
-            '任务完成！'
+            'Task completed!'
         ));
     }
 
     /**
-     * 模拟工作负载
+     * Simulate work load
      */
     private function simulateWork(int $step): void
     {
-        // 模拟每个步骤耗时 1-2 秒
-        usleep(rand(500000, 2000000)); // 0.5 到 2 秒
+        // Simulate each step taking 1-2 seconds
+        usleep(rand(500000, 2000000)); // 0.5 to 2 seconds
     }
 
     /**
-     * 获取状态消息
+     * Get status message
      */
     private function getStatusMessage(int $step): string
     {
         $messages = [
-            1 => '正在初始化...',
-            2 => '正在处理数据...',
-            3 => '正在验证信息...',
-            4 => '正在生成报告...',
-            5 => '正在保存文件...',
-            6 => '正在上传数据...',
-            7 => '正在分析结果...',
-            8 => '正在优化性能...',
-            9 => '正在进行最终检查...',
-            10 => '任务完成！',
+            1 => 'Initializing...',
+            2 => 'Processing data...',
+            3 => 'Validating information...',
+            4 => 'Generating report...',
+            5 => 'Saving files...',
+            6 => 'Uploading data...',
+            7 => 'Analyzing results...',
+            8 => 'Optimizing performance...',
+            9 => 'Performing final check...',
+            10 => 'Task completed!',
         ];
 
-        return $messages[$step] ?? "正在处理步骤 {$step}...";
+        return $messages[$step] ?? "Processing step {$step}...";
     }
 }
 

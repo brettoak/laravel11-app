@@ -14,7 +14,7 @@ class ServiceGreeting5 extends Component
 
     public function mount()
     {
-        // 初始化数据（模拟加载用户信息）
+        // Initialize data (simulate loading user information)
         $this->name = "James";
         $this->email = "james@example.com";
         $this->bio = "PHP Developer";
@@ -26,13 +26,13 @@ class ServiceGreeting5 extends Component
     {
         $this->isSaving = true;
 
-        // 模拟保存延迟
+        // Simulate save delay
         sleep(1);
 
-        // 模拟保存完成
+        // Simulate save completion
         $this->isSaving = false;
 
-        // 发射事件通知父组件或页面刷新
+        // Dispatch event to notify parent component or page refresh
         $this->dispatch('profileSaved');
     }
 
