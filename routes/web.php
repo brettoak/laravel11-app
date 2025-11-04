@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Conversation;
 use App\Http\Controllers\ReverbTest;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;

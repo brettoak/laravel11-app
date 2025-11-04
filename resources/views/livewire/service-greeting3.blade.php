@@ -36,22 +36,12 @@
 
     <div class="mb-4">
         <h2 class="text-2xl font-bold">数据展示</h2>
-        <div x-data="{
-                email: '',
-                isValid: false,
-
-                validate() {
-                    this.isValid = this.email.includes('@');
-                }
-            }">
+        <div x-data="{ email: '', isValid: false, validate() { this.isValid = this.email.includes('@'); } }">
             <input
                 type="email"
                 x-model="email"
                 @input="validate()"
-                :class="{
-            'border-red-500': !isValid && email.length > 0,
-            'border-green-500': isValid
-        }"
+                :class="{ 'border-red-500': !isValid && email.length > 0, 'border-green-500': isValid }"
                 class="border-2 px-4 py-2">
 
             <p :class="{ 'text-red-500': !isValid, 'text-green-500': isValid }">
