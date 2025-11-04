@@ -4,11 +4,11 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TaskProgressUpdated implements ShouldBroadcast
+class TaskProgressUpdated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -45,11 +45,12 @@ class TaskProgressUpdated implements ShouldBroadcast
 
     /**
      * 事件的广播名称
+     * 注释掉 broadcastAs() 使用默认事件名称：App\Events\TaskProgressUpdated
      */
-    public function broadcastAs(): string
-    {
-        return 'progress.updated';
-    }
+    // public function broadcastAs(): string
+    // {
+    //     return 'progress.updated';
+    // }
 
     /**
      * 获取要广播的数据
