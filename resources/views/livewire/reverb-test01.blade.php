@@ -1,18 +1,18 @@
 <div class="max-w-4xl mx-auto p-6" id="reverb-test-component">
     <div class="bg-white rounded-lg shadow-lg p-8">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Job 进度实时监控演示</h2>
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Job Progress Real-time Monitoring Demo</h2>
 
         <!-- Task information card -->
         <div class="mb-6 p-4 bg-gray-50 rounded-lg">
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                    <span class="text-sm text-gray-600">任务 ID:</span>
-                    <p class="text-sm font-mono text-gray-800">{{ $taskId ?? '未开始' }}</p>
+                    <span class="text-sm text-gray-600">Task ID:</span>
+                    <p class="text-sm font-mono text-gray-800">{{ $taskId ?? 'Not started' }}</p>
                 </div>
                 <div>
-                    <span class="text-sm text-gray-600">状态:</span>
+                    <span class="text-sm text-gray-600">Status:</span>
                     <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold {{ $isRunning ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800' }}">
-                        {{ $isRunning ? '运行中' : '空闲' }}
+                        {{ $isRunning ? 'Running' : 'Idle' }}
                     </span>
                 </div>
             </div>
@@ -20,7 +20,7 @@
             <!-- Progress bar -->
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-semibold text-gray-700">进度</span>
+                    <span class="text-sm font-semibold text-gray-700">Progress</span>
                     <span class="text-sm font-semibold text-gray-700">{{ number_format($progress, 1) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
@@ -37,7 +37,7 @@
 
             <!-- Status message -->
             <div class="p-3 bg-white rounded border border-gray-200">
-                <span class="text-sm text-gray-600">当前状态:</span>
+                <span class="text-sm text-gray-600">Current Status:</span>
                 <p class="text-sm font-semibold text-gray-800 mt-1">{{ $message }}</p>
             </div>
         </div>
@@ -49,14 +49,14 @@
                     wire:click="startTask"
                     class="px-6 py-3 bg-green-600 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                 >
-                    启动任务
+                    Start Task
                 </button>
             @else
                 <button
                     disabled
                     class="px-6 py-3 bg-amber-500 text-white rounded-lg font-semibold cursor-not-allowed shadow-md border-2 border-amber-600 opacity-90"
                 >
-                    ⏳ 任务运行中...
+                    ⏳ Task Running...
                 </button>
             @endif
 
@@ -65,7 +65,7 @@
                     wire:click="resetTask"
                     class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                 >
-                    重置
+                    Reset
                 </button>
             @endif
         </div>
@@ -73,7 +73,7 @@
         <!-- Steps list -->
         @if($taskId)
             <div class="mt-6">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">执行步骤</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-800">Execution Steps</h3>
                 <div class="space-y-2">
                     @for($i = 1; $i <= $totalSteps; $i++)
                         <div class="flex items-center gap-3 p-2 rounded {{ $i <= $currentStep ? 'bg-green-50 border border-green-200' : ($i == $currentStep + 1 && $isRunning ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50') }}">
@@ -87,7 +87,7 @@
                                 @endif
                             </div>
                             <span class="text-sm {{ $i <= $currentStep ? 'text-green-800 font-semibold' : ($i == $currentStep + 1 && $isRunning ? 'text-yellow-800' : 'text-gray-600') }}">
-                                步骤 {{ $i }}: {{ $i <= $currentStep ? '已完成' : ($i == $currentStep + 1 && $isRunning ? '执行中...' : '等待中') }}
+                                Step {{ $i }}: {{ $i <= $currentStep ? 'Completed' : ($i == $currentStep + 1 && $isRunning ? 'In Progress...' : 'Waiting') }}
                             </span>
                         </div>
                     @endfor

@@ -8,7 +8,7 @@
 
                 initGrid() {
                     const gridOptions = {
-                        theme: window.themeQuartz, // 使用新的主题 API
+                        theme: window.themeQuartz, // Use the new theme API
                         columnDefs: this.columnDefs,
                         rowData: this.rowData,
                         defaultColDef: {
@@ -35,7 +35,7 @@
 
 
     <div class="mb-4">
-        <h2 class="text-2xl font-bold">数据展示</h2>
+        <h2 class="text-2xl font-bold">Data Display</h2>
         <div x-data="{ email: '', isValid: false, validate() { this.isValid = this.email.includes('@'); } }">
             <input
                 type="email"
@@ -45,8 +45,8 @@
                 class="border-2 px-4 py-2">
 
             <p :class="{ 'text-red-500': !isValid, 'text-green-500': isValid }">
-                <span x-show="!isValid && email.length > 0">❌ 邮箱格式不正确</span>
-                <span x-show="isValid">✅ 邮箱格式正确</span>
+                <span x-show="!isValid && email.length > 0">❌ Invalid email format</span>
+                <span x-show="isValid">✅ Valid email format</span>
             </p>
         </div>
 
