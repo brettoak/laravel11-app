@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -38,9 +38,9 @@ class TaskProgressUpdated implements ShouldBroadcast
     /**
      * 获取事件应该广播到的频道
      */
-    public function broadcastOn(): Channel
+    public function broadcastOn(): PrivateChannel
     {
-        return new Channel("task-progress.{$this->taskId}");
+        return new PrivateChannel("task-progress.{$this->taskId}");
     }
 
     /**

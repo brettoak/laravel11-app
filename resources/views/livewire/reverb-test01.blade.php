@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto p-6">
+<div class="max-w-4xl mx-auto p-6" id="reverb-test-component">
     <div class="bg-white rounded-lg shadow-lg p-8">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Job 进度实时监控演示</h2>
 
@@ -77,8 +77,7 @@
                 <div class="space-y-2">
                     @for($i = 1; $i <= $totalSteps; $i++)
                         <div class="flex items-center gap-3 p-2 rounded {{ $i <= $currentStep ? 'bg-green-50 border border-green-200' : ($i == $currentStep + 1 && $isRunning ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50') }}">
-                            <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-semibold text-xs
-                                {{ $i < $currentStep ? 'bg-green-500 text-white' : ($i == $currentStep ? 'bg-yellow-500 text-white animate-pulse' : 'bg-gray-300 text-gray-600') }}">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-semibold text-xs {{ $i < $currentStep ? 'bg-green-500 text-white' : ($i == $currentStep ? 'bg-yellow-500 text-white animate-pulse' : 'bg-gray-300 text-gray-600') }}">
                                 @if($i < $currentStep)
                                     ✓
                                 @elseif($i == $currentStep && $isRunning)
@@ -100,7 +99,7 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('livewire:init', () => {
         // 确保 Echo 已初始化
         if (typeof Echo !== 'undefined' && typeof Livewire !== 'undefined') {
             let channel = null;
@@ -108,31 +107,49 @@
             // 监听 Livewire 事件来启动/停止监听
             window.Livewire.on('task-started', (event) => {
                 const taskId = event[0] || event.taskId;
+                console.log('收到 task-started 事件，任务ID:', taskId);
 
                 // 断开之前的连接
                 if (channel) {
                     Echo.leave(channel.name);
+                    channel = null;
                 }
 
+                // 通过 DOM 元素获取组件 ID（在事件触发时获取，确保组件已挂载）
+                const componentElement = document.getElementById('reverb-test-component');
+                const componentId = componentElement ? componentElement.getAttribute('wire:id') : null;
+                
+                console.log('组件 ID:', componentId);
+
                 // 监听新任务的进度更新
-                channel = Echo.private(`task-progress.${taskId}`)
+                channel = Echo.private('task-progress.' + taskId)
                     .listen('.progress.updated', (data) => {
                         console.log('收到进度更新:', data);
 
-                        // 更新 Livewire 组件
-                        @this.set('currentStep', data.currentStep);
-                        @this.set('progress', data.progress);
-                        @this.set('message', data.message);
+                        // 获取组件实例并更新
+                        if (componentId) {
+                            const component = Livewire.find(componentId);
+                            if (component) {
+                                console.log('更新组件状态:', data);
+                                component.set('currentStep', data.currentStep);
+                                component.set('progress', data.progress);
+                                component.set('message', data.message);
 
-                        // 如果任务完成，设置运行状态为 false
-                        if (data.progress >= 100) {
-                            setTimeout(() => {
-                                @this.set('isRunning', false);
-                            }, 1000);
+                                // 如果任务完成，设置运行状态为 false
+                                if (data.progress >= 100) {
+                                    setTimeout(() => {
+                                        component.set('isRunning', false);
+                                    }, 1000);
+                                }
+                            } else {
+                                console.error('无法找到 Livewire 组件，ID:', componentId);
+                            }
+                        } else {
+                            console.error('组件 ID 为空');
                         }
                     });
 
-                console.log('已连接到任务进度频道:', `task-progress.${taskId}`);
+                console.log('已连接到任务进度频道: task-progress.' + taskId);
             });
 
             // 监听重置事件
@@ -140,6 +157,7 @@
                 if (channel) {
                     Echo.leave(channel.name);
                     channel = null;
+                    console.log('已断开任务进度频道连接');
                 }
             });
         } else {
