@@ -31,8 +31,7 @@ class ReverbTest01 extends Component
 
         // Dispatch task to queue
         ProcessTaskJob::dispatch($this->taskId, $this->totalSteps);
-
-
+        
         // Dispatch event to notify frontend to start listening
         $this->dispatch('task-started', taskId: $this->taskId);
     }
