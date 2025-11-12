@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ReverbTest
+class ReverbSingleJob
 {
 
 //    public function __construct()
@@ -14,6 +14,7 @@ class ReverbTest
 
     public function index()
     {
-        return view('reverb.test');
+        return view('reverb.single.job');
     }
+
 }

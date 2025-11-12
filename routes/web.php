@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Conversation;
-use App\Http\Controllers\ReverbTest;
+use App\Http\Controllers\ReverbSingleJob;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 
@@ -30,7 +30,7 @@ Route::get('/test2', static function () {
 });
 
 // Test route - no authentication required
-Route::get('/reverb-test-public', [ReverbTest::class, 'index']);
+Route::get('/reverb-test-public', [ReverbSingleJob::class, 'index']);
 
 
 Route::middleware([
@@ -44,7 +44,9 @@ Route::middleware([
 
     Route::get('/service', [ServiceController::class, 'index']);
 
-    Route::get('/reverb-test', [ReverbTest::class, 'index']);
+    Route::get('/reverb/single/job', [ReverbSingleJob::class, 'index']);
+
+    Route::get('/reverb/multiple/jobs', [ReverbMultipleJobs::class, 'idnex']);
 
     Route::get('/conversation', [Conversation::class, 'index']);
 });
