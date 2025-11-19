@@ -8,11 +8,7 @@ use App\Http\Controllers\ServiceController;
 
 
 Route::redirect('/register', '/login');
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::redirect('/', '/login');
 
 Route::get('/test1', function () {
     return 'test1';
