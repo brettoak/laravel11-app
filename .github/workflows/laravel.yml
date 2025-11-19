@@ -62,10 +62,31 @@ jobs:
       - name: Run post-deploy commands on server
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd /www/laravel-app/ && \
-            composer install --no-dev --optimize-autoloader && \
-            php artisan migrate --force && \
-            php artisan config:cache && \
-            php artisan route:cache && \
-            php artisan view:cache
+          cd /www/laravel-app/ && \
+          # Change ownership of storage and bootstrap/cache to www-data user/group
+          sudo chown -R www-data:www-data storage bootstrap/cache && \
+
+          # Set read/write/execute permissions for owner and group on storage and bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache && \
+
+          # Install the Faker package (used for generating fake data)
+          composer require fakerphp/faker --no-interaction && \
+
+          # Install composer dependencies without dev packages and optimize autoloader
+          composer install --no-dev --optimize-autoloader && \
+
+          # Run database migrations to update schema
+          php artisan migrate --force && \
+
+          # Seed the database with initial or test data
+          php artisan db:seed && \
+
+          # Cache the configuration for better performance
+          php artisan config:cache && \
+
+          # Cache the routes to improve route lookup performance
+          php artisan route:cache && \
+
+          # Cache the compiled views for faster rendering
+          php artisan view:cache
           "
