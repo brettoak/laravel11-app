@@ -2,7 +2,7 @@ name: Deploy Laravel App to Azure VM
 
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]
 
 jobs:
   deploy:
@@ -52,8 +52,15 @@ jobs:
       # 7. Deploy to server using rsync
       - name: Deploy Laravel App
         run: |
-          rsync -avz --delete \
+          ssh -o StrictHostKeyChecking=no \
+          -i ~/.ssh/id_rsa \
+          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+          "sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} ${{ secrets.LARAVEL_DEPLOY_DIR }}"
+
+          rsync -az --delete \
             -e "ssh -i ~/.ssh/id_rsa" \
+            --exclude ".env" \
+            --exclude "ca.pem" \
             ./ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.LARAVEL_DEPLOY_DIR }}
 
@@ -61,10 +68,26 @@ jobs:
       - name: Run post-deploy commands on server
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
-            cd /www/laravel-app/ && \
-            composer install --no-dev --optimize-autoloader && \
-            php artisan migrate --force && \
-            php artisan config:cache && \
-            php artisan route:cache && \
-            php artisan view:cache
+          cd /www/laravel-app/ && \
+
+          # Install the Faker package (used for generating fake data)
+          composer require fakerphp/faker --no-interaction && \
+
+          # Install composer dependencies without dev packages and optimize autoloader
+          composer install --no-dev --optimize-autoloader && \
+
+          # Change ownership of storage and bootstrap/cache to www-data user/group
+          sudo chown -R www-data:www-data storage bootstrap/cache && \
+
+          # Set read/write/execute permissions for owner and group on storage and bootstrap/cache
+          sudo chmod -R 775 storage bootstrap/cache && \
+
+          # Cache the configuration for better performance
+          sudo php artisan config:cache && \
+
+          # Cache the routes to improve route lookup performance
+          sudo php artisan route:cache && \
+
+          # Cache the compiled views for faster rendering
+          sudo php artisan view:cache
           "

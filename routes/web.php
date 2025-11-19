@@ -5,14 +5,9 @@ use App\Http\Controllers\ReverbSingleJob;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 
-
-
 Route::redirect('/register', '/login');
-Route::redirect('/', '/login');
 
-Route::get('/test1', function () {
-    return 'test1';
-});
+Route::redirect('/', '/login');
 
 Route::get('/test2', static function () {
     return response()->json([
@@ -24,10 +19,6 @@ Route::get('/test2', static function () {
         ],
     ]);
 });
-
-// Test route - no authentication required
-Route::get('/reverb-test-public', [ReverbSingleJob::class, 'index']);
-
 
 Route::middleware([
     'auth:sanctum',
