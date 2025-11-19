@@ -54,6 +54,7 @@ jobs:
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_rsa" \
+            --exclude ".env" \
             ./ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.LARAVEL_DEPLOY_DIR }}
 
