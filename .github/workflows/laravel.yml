@@ -52,6 +52,7 @@ jobs:
       # 7. Deploy to server using rsync
       - name: Deploy Laravel App
         run: |
+          sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} ${{ secrets.LARAVEL_DEPLOY_DIR }} && \
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_rsa" \
             --exclude ".env" \
