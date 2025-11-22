@@ -75,7 +75,7 @@ jobs:
           sudo chmod -R 775 storage bootstrap/cache && \
 
           # Install the Faker package (used for generating fake data)
-          composer require fakerphp/faker --no-interaction && \
+          composer require fakerphp/faker --no-audit --no-interaction && \
 
           # Install composer dependencies without dev packages and optimize autoloader
           composer install --no-dev --optimize-autoloader && \
