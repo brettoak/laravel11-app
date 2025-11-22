@@ -68,17 +68,18 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
           cd /www/laravel-app/ && \
+
+          # Install the Faker package (used for generating fake data)
+          composer require fakerphp/faker --no-interaction && \
+
+          # Install composer dependencies without dev packages and optimize autoloader
+          composer install --no-dev --optimize-autoloader && \
+
           # Change ownership of storage and bootstrap/cache to www-data user/group
           sudo chown -R www-data:www-data storage bootstrap/cache && \
 
           # Set read/write/execute permissions for owner and group on storage and bootstrap/cache
           sudo chmod -R 775 storage bootstrap/cache && \
-
-          # Install the Faker package (used for generating fake data)
-          composer require fakerphp/faker --no-audit --no-interaction && \
-
-          # Install composer dependencies without dev packages and optimize autoloader
-          composer install --no-dev --optimize-autoloader && \
 
           # Run database migrations to update schema
           php artisan migrate --force && \
