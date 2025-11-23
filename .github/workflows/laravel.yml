@@ -82,12 +82,6 @@ jobs:
           # Set read/write/execute permissions for owner and group on storage and bootstrap/cache
           sudo chmod -R 775 storage bootstrap/cache && \
 
-          # Run database migrations to update schema
-          php artisan migrate --force && \
-
-          # Seed the database with initial or test data
-          php artisan db:seed && \
-
           # Cache the configuration for better performance
           php artisan config:cache && \
 
