@@ -60,6 +60,7 @@ jobs:
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_rsa" \
             --exclude ".env" \
+            --exclude "ca.pem" \
             ./ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.LARAVEL_DEPLOY_DIR }}
 
