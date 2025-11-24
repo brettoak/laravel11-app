@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Conversation;
+use App\Http\Controllers\ReverbMultipleJobs;
 use App\Http\Controllers\ReverbSingleJob;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
@@ -33,7 +34,7 @@ Route::middleware([
 
     Route::get('/reverb/single/job', [ReverbSingleJob::class, 'index']);
 
-    Route::get('/reverb/multiple/jobs', [ReverbMultipleJobs::class, 'idnex']);
+    Route::get('/reverb/multiple/jobs', [ReverbMultipleJobs::class, 'index']);
 
     Route::get('/conversation', [Conversation::class, 'index']);
 });
