@@ -30,6 +30,10 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
+    Route::get('/admin', function () {
+        return view('admin');
+    })->name('admin');
+
     Route::get('/service', [ServiceController::class, 'index']);
 
     Route::get('/reverb/single/job', [ReverbSingleJob::class, 'index']);
