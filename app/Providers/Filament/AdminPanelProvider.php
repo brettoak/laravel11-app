@@ -19,6 +19,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Livewire\ReverbTest01;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -34,15 +35,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationItems([
                 NavigationItem::make('Single Job')
-                    ->url('/reverb/single/job', shouldOpenInNewTab: false)
+                    ->url(route('/'), shouldOpenInNewTab: false)
                     ->icon('heroicon-o-presentation-chart-line')
                     ->group('Task Management')
-                    ->sort(1),
-                NavigationItem::make('Multiple Jobs')
-                    ->url('/reverb/multiple/jobs', shouldOpenInNewTab: false)
-                    ->icon('heroicon-o-presentation-chart-line')
-                    ->group('Task Management')
-                    ->sort(2),
+                    ->sort(1)
+                    ->pages([
+                        ReverbTest01::class,
+                    ]),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
