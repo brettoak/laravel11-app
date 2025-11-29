@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ReverbSingleJob
 {
 
-//    public function __construct()
-//    {
-//        dd(csrf_token());
-//    }
-
-    public function index()
+    public function index(): View
     {
         return view('reverb.single.job');
     }
-
+    
 }
