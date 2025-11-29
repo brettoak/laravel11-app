@@ -34,11 +34,12 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->navigationItems([
-//                NavigationItem::make('Single Job')
-//                    ->url(route(''), shouldOpenInNewTab: false)
-//                    ->icon('heroicon-o-presentation-chart-line')
-//                    ->group('Task Management')
-//                    ->sort(1)
+            //    NavigationItem::make('Single Job')
+            //        ->url('http://localhost:8081/reverb/single/jobs', shouldOpenInNewTab: false)
+            //        ->icon('heroicon-o-presentation-chart-line')
+            //        ->group('Task Management')
+            //        ->sort(1)
+            //        ->page(ReverbSingleJob::class),
 
             ])
             ->sidebarCollapsibleOnDesktop()
