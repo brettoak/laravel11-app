@@ -34,14 +34,12 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->navigationItems([
-                NavigationItem::make('Single Job')
-                    ->url(route('/'), shouldOpenInNewTab: false)
-                    ->icon('heroicon-o-presentation-chart-line')
-                    ->group('Task Management')
-                    ->sort(1)
-                    ->pages([
-                        ReverbTest01::class,
-                    ]),
+//                NavigationItem::make('Single Job')
+//                    ->url(route(''), shouldOpenInNewTab: false)
+//                    ->icon('heroicon-o-presentation-chart-line')
+//                    ->group('Task Management')
+//                    ->sort(1)
+
             ])
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

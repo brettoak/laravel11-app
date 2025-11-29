@@ -10,8 +10,6 @@ Route::redirect('/register', '/login');
 
 Route::redirect('/', '/login');
 
-// Route::redirect('/login', '/admin/login');
-
 Route::get('/test2', static function () {
     return response()->json([
         'message' => 'test2',
@@ -32,9 +30,6 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // Route::get('/admin', function () {
-    //     return view('admin');
-    // })->name('admin');
 
     Route::get('/service', [ServiceController::class, 'index']);
 
