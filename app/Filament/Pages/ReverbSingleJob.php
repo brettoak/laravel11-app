@@ -15,6 +15,6 @@ class ReverbSingleJob extends Page
 
     public function getTitle(): string
     {
-        return 'Reverb Single Job';
+        return "";
     }
 }
