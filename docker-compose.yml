@@ -1,124 +1,128 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel11_app
-    ports:
-      - "8081:80"
-    volumes:
-      - .:/var/www/html
-    depends_on:
-      - mysql
-    environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=laravel
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-      - REDIS_HOST=my-redis
-      - REDIS_PORT=6379
-      - QUEUE_CONNECTION=redis
-      - BROADCAST_DRIVER=reverb
-      - REVERB_APP_ID=my-app-id
-      - REVERB_APP_KEY=my-app-key
-      - REVERB_APP_SECRET=my-app-secret
-      - REVERB_HOST=my-reverb
-      - REVERB_PORT=8080
-      - REVERB_SCHEME=http
-    networks:
-      - my-network
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel11_app
+        ports:
+            - "8081:80"
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            - mysql
+            - redis
+        environment:
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=laravel
+            - DB_USERNAME=root
+            - DB_PASSWORD=root
+            - REDIS_HOST=my-redis
+            - REDIS_PORT=6379
+            - QUEUE_CONNECTION=redis
+            - BROADCAST_DRIVER=reverb
+            - REVERB_APP_ID=my-app-id
+            - REVERB_APP_KEY=my-app-key
+            - REVERB_APP_SECRET=my-app-secret
+            - REVERB_HOST=my-reverb
+            - REVERB_PORT=8080
+            - REVERB_SCHEME=http
+        networks:
+            - my-network
 
-  mysql:
-    image: mysql:8.0
-    container_name: laravel11_mysql
-    restart: always
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-    volumes:
-      - dbdata:/var/lib/mysql
-      - ./mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql
-    networks:
-      - my-network
+    mysql:
+        image: mysql:8.0
+        container_name: laravel11_mysql
+        restart: always
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel
+        volumes:
+            - dbdata:/var/lib/mysql
+            - ./mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql
+        networks:
+            - my-network
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    restart: always
-    ports:
-      - "8082:80"
-    environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOST=mysql
-    networks:
-      - my-network
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports:
+            - "8082:80"
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=mysql
+        networks:
+            - my-network
 
-  # MailHog for email testing
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: mailhog
-    restart: unless-stopped
-    ports:
-      - "1025:1025"  # SMTP port
-      - "8025:8025"  # Web UI port
-    networks:
-      - my-network
+    # MailHog for email testing
+    mailhog:
+        image: mailhog/mailhog:latest
+        container_name: mailhog
+        restart: unless-stopped
+        ports:
+            - "1025:1025" # SMTP port
+            - "8025:8025" # Web UI port
+        networks:
+            - my-network
 
-  vite:
-    build:
-      context: .
-      dockerfile: Dockerfile.vite
-    container_name: laravel11_vite
-    ports:
-      - "5173:5173"
-    volumes:
-      - .:/var/www/html
-    working_dir: /var/www/html
-    command: npm run dev -- --host 0.0.0.0
-    networks:
-      - my-network
+    vite:
+        build:
+            context: .
+            dockerfile: Dockerfile.vite
+        container_name: laravel11_vite
+        ports:
+            - "5173:5173"
+        volumes:
+            - .:/var/www/html
+        working_dir: /var/www/html
+        command: npm run dev -- --host 0.0.0.0
+        networks:
+            - my-network
 
-  reverb:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: my-reverb
-    restart: unless-stopped
-    command: php artisan reverb:start --host=0.0.0.0 --port=8080
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_CONNECTION=mysql
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_DATABASE=laravel
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-      - REDIS_HOST=my-redis
-      - REDIS_PORT=6379
-      - REVERB_HOST=0.0.0.0
-      - REVERB_PORT=8080
-    depends_on:
-      - mysql
-      - redis
-    networks:
-      - my-network
+    reverb:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: my-reverb
+        restart: unless-stopped
+        command: php artisan reverb:start --host=0.0.0.0 --port=8080
+        ports:
+            - "8080:8080"
+        environment:
+            - DB_CONNECTION=mysql
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=laravel
+            - DB_USERNAME=root
+            - DB_PASSWORD=root
+            - REDIS_HOST=my-redis
+            - REDIS_PORT=6379
+            - REVERB_APP_ID=my-app-id
+            - REVERB_APP_KEY=my-app-key
+            - REVERB_APP_SECRET=my-app-secret
+            - REVERB_HOST=my-reverb
+            - REVERB_PORT=8080
+            - REVERB_SCHEME=http
+        depends_on:
+            - mysql
+            - redis
+        networks:
+            - my-network
 
-  redis:
-    image: redis:alpine
-    container_name: my-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    networks:
-      - my-network
+    redis:
+        image: redis:alpine
+        container_name: my-redis
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        networks:
+            - my-network
 
 networks:
-  my-network:
-    driver: bridge
+    my-network:
+        driver: bridge
 
 volumes:
-  dbdata:
-
+    dbdata:
