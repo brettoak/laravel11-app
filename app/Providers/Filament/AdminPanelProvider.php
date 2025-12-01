@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
 
 
             ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->brandName("Brett Han")
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

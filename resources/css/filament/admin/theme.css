@@ -2,3 +2,88 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+
+/* ------------------------------------------------------------
+   Custom Theme: Modern Soft (Light Mode)
+   ------------------------------------------------------------ */
+
+@layer base {
+    /* Global background adjustment */
+    body {
+        @apply bg-slate-50;
+    }
+}
+
+@layer utilities {
+    /* 1. Scrollbar Customization */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+    }
+}
+
+@layer components {
+    /* 2. Card & Container Optimization */
+    /* Moved ! to the front of classes instead of using !important at the end */
+    .fi-section,
+    .fi-wi-stats-overview-stat,
+    .fi-ta-ctn {
+        @apply !shadow-sm !ring-1 !ring-slate-200/50 !rounded-xl;
+    }
+
+    /* 3. Sidebar Optimization */
+    .fi-sidebar {
+        @apply !border-r !border-slate-200 bg-stone-50 !backdrop-blur-md;
+    }
+
+    .fi-sidebar-nav {
+        @apply gap-y-1;
+    }
+
+    /* Sidebar active item highlighting */
+    .fi-sidebar-item-active a {
+        @apply !bg-primary-50 !text-primary-600 !font-semibold;
+    }
+
+    /* 4. Input Optimization */
+    .fi-input, .fi-select-input {
+        @apply !shadow-none !bg-white transition-all duration-200;
+    }
+
+    /* Input focus ring */
+    :is(.fi-input-wrp:focus-within) {
+        @apply !ring-2 !ring-primary-500/20 !border-primary-500;
+    }
+
+    /* 5. Button Optimization */
+    .fi-btn {
+        @apply !rounded-lg transition-transform active:scale-95;
+    }
+
+    .fi-btn-primary {
+        @apply !shadow-lg hover:!shadow-primary-500/30;
+        /* Custom shadow color needs to be handled carefully, if utility exists */
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2) !important;
+    }
+
+    /* 6. Table Optimization */
+    .fi-ta-header-cell {
+        @apply !text-slate-500 !font-medium uppercase tracking-wider !text-xs;
+    }
+
+    .fi-ta-row:hover {
+        @apply !bg-slate-50 transition-colors;
+    }
+
+    /* 7. Topbar */
+    .fi-topbar {
+        @apply !bg-white/80 !backdrop-blur-md !border-b !border-slate-100 !shadow-sm;
+    }
+}
