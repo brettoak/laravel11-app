@@ -13,6 +13,16 @@ class ReverbSingleJob extends Page
         return [];
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        return "New";
+    }
+
+    public static function getNavigationIcon(): string
+    {
+        return "heroicon-o-star";
+    }
+
     public function getTitle(): string
     {
         return "";

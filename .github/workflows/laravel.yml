@@ -92,10 +92,5 @@ jobs:
           sudo php artisan route:cache && \
 
           # Cache the compiled views for faster rendering
-          sudo php artisan view:cache \
-
-          # Run reverb and queue workers in the background
-          sudo php artisan reverb:start & \
-          sudo php artisan queue:work --tries=3 --delay=90 & \
-          sudo php artisan queue:work --tries=3 --delay=90 &
+          sudo php artisan view:cache
           "

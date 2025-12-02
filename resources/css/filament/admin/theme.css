@@ -3,15 +3,20 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 
+/* 定义自定义深色颜色变量 */
+:root {
+    --color-dark-primary: #141414;
+    --color-dark-secondary: #0a0a0a;
+}
 
 /* ------------------------------------------------------------
-   Custom Theme: Modern Soft (Light Mode)
+   Custom Theme: Modern Soft (Light & Dark Mode)
    ------------------------------------------------------------ */
 
 @layer base {
     /* Global background adjustment */
     body {
-        @apply bg-slate-50;
+        @apply bg-slate-50 dark:bg-[#141414];
     }
 }
 
@@ -25,22 +30,21 @@
         @apply bg-transparent;
     }
     ::-webkit-scrollbar-thumb {
-        @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+        @apply bg-slate-300 dark:bg-[#2a2a2a] rounded-full hover:bg-slate-400 dark:hover:bg-[#3a3a3a] transition-colors;
     }
 }
 
 @layer components {
     /* 2. Card & Container Optimization */
-    /* Moved ! to the front of classes instead of using !important at the end */
     .fi-section,
     .fi-wi-stats-overview-stat,
     .fi-ta-ctn {
-        @apply !shadow-sm !ring-1 !ring-slate-200/50 !rounded-xl;
+        @apply !shadow-sm !ring-1 !ring-slate-200/50 dark:!ring-[#2a2a2a] !rounded-xl dark:!bg-[#0a0a0a];
     }
 
     /* 3. Sidebar Optimization */
     .fi-sidebar {
-        @apply !border-r !border-slate-200 bg-stone-50 !backdrop-blur-md;
+        @apply !border-r !border-slate-200 dark:!border-[#2a2a2a] bg-stone-50 dark:bg-[#141414] !backdrop-blur-md;
     }
 
     .fi-sidebar-nav {
@@ -49,17 +53,22 @@
 
     /* Sidebar active item highlighting */
     .fi-sidebar-item-active a {
-        @apply !bg-primary-50 !text-primary-600 !font-semibold;
+        @apply !bg-primary-50 dark:!bg-[#1a1a1a] !text-primary-600 dark:!text-primary-400 !font-semibold;
+    }
+
+    /* Sidebar items text color */
+    .fi-sidebar-item a {
+        @apply dark:!text-slate-300;
     }
 
     /* 4. Input Optimization */
     .fi-input, .fi-select-input {
-        @apply !shadow-none !bg-white transition-all duration-200;
+        @apply !shadow-none !bg-white dark:!bg-[#0a0a0a] !text-slate-900 dark:!text-slate-100 dark:!border-[#2a2a2a] transition-all duration-200;
     }
 
     /* Input focus ring */
     :is(.fi-input-wrp:focus-within) {
-        @apply !ring-2 !ring-primary-500/20 !border-primary-500;
+        @apply !ring-2 !ring-primary-500/20 dark:!ring-primary-400/20 !border-primary-500 dark:!border-primary-400;
     }
 
     /* 5. Button Optimization */
@@ -68,22 +77,45 @@
     }
 
     .fi-btn-primary {
-        @apply !shadow-lg hover:!shadow-primary-500/30;
-        /* Custom shadow color needs to be handled carefully, if utility exists */
+        @apply !shadow-lg hover:!shadow-primary-500/30 dark:hover:!shadow-primary-500/20;
         box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2) !important;
     }
 
     /* 6. Table Optimization */
     .fi-ta-header-cell {
-        @apply !text-slate-500 !font-medium uppercase tracking-wider !text-xs;
+        @apply !text-slate-500 dark:!text-slate-400 !font-medium uppercase tracking-wider !text-xs;
+    }
+
+    .fi-ta-row {
+        @apply dark:!border-[#2a2a2a] dark:!bg-[#0a0a0a];
     }
 
     .fi-ta-row:hover {
-        @apply !bg-slate-50 transition-colors;
+        @apply !bg-slate-50 dark:!bg-[#141414] transition-colors;
     }
 
     /* 7. Topbar */
     .fi-topbar {
-        @apply !bg-white/80 !backdrop-blur-md !border-b !border-slate-100 !shadow-sm;
+        @apply !bg-white/80 dark:!bg-[#141414]/95 !backdrop-blur-md !border-b !border-slate-100 dark:!border-[#2a2a2a] !shadow-sm;
+    }
+
+    /* 8. Text Color Adjustments */
+    .fi-topbar, .fi-sidebar {
+        @apply !text-slate-900 dark:!text-slate-50;
+    }
+
+    /* 9. Modal & Dropdown */
+    .fi-modal-heading {
+        @apply dark:!text-white;
+    }
+
+    /* Dropdown menu */
+    .fi-dropdown-menu {
+        @apply dark:!bg-[#141414] dark:!border-[#2a2a2a];
+    }
+
+    /* 10. Badge & Tags */
+    .fi-badge {
+        @apply dark:!bg-[#1a1a1a] dark:!text-slate-200;
     }
 }
