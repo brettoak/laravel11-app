@@ -10,7 +10,7 @@ Route::redirect('/register', '/login');
 
 Route::redirect('/', '/login');
 
-Route::redirect('/admin/login', '/admin');
+Route::redirect('/admin/login', '/login');
 
 Route::get('/test2', static function () {
     return response()->json([
