@@ -82,6 +82,9 @@ jobs:
           # Set read/write/execute permissions for owner and group on storage and bootstrap/cache
           sudo chmod -R 775 storage bootstrap/cache && \
 
+          # Clear all existing caches to ensure fresh state
+          sudo php artisan optimize:clear && \
+
           # Cache the configuration for better performance
           sudo php artisan config:cache && \
 
@@ -89,5 +92,10 @@ jobs:
           sudo php artisan route:cache && \
 
           # Cache the compiled views for faster rendering
-          sudo php artisan view:cache
+          sudo php artisan view:cache \
+
+          # Run reverb and queue workers in the background
+          sudo php artisan reverb:start & \
+          sudo php artisan queue:work --tries=3 --delay=90 & \
+          sudo php artisan queue:work --tries=3 --delay=90 &
           "
