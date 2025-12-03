@@ -167,15 +167,33 @@
                 });
 
                 // Listen for the TaskProgressUpdated event
-                // Laravel Echo automatically prepends a dot for namespaced events
+                // Try multiple event name formats to ensure compatibility
+                
+                // Format 1: With namespace and dot prefix (Laravel Echo default)
                 channel.listen('.App.Events.TaskProgressUpdated', (data) => {
-                    console.log('📨 Received progress update event');
-                    console.log('   Channel:', channelName);
+                    console.log('📨 Received event (format 1): .App.Events.TaskProgressUpdated');
+                    updateComponentState(data, component, componentId);
+                });
+
+                // Format 2: Just the class name
+                channel.listen('TaskProgressUpdated', (data) => {
+                    console.log('📨 Received event (format 2): TaskProgressUpdated');
+                    updateComponentState(data, component, componentId);
+                });
+
+                // Format 3: With namespace but no dot
+                channel.listen('App.Events.TaskProgressUpdated', (data) => {
+                    console.log('📨 Received event (format 3): App.Events.TaskProgressUpdated');
+                    updateComponentState(data, component, componentId);
+                });
+
+                // Helper function to update component state
+                function updateComponentState(data, componentId) {
+                    console.log('🔄 Updating Livewire component...');
                     console.log('   Data received:', JSON.stringify(data, null, 2));
 
                     const component = Livewire.find(componentId);
                     if (component) {
-                        console.log('🔄 Updating Livewire component...');
                         console.log('   Component ID:', componentId);
                         console.log('   Current state:', {
                             currentStep: component.get('currentStep'),
@@ -206,16 +224,23 @@
                         console.error('   Component ID:', componentId);
                         console.error('   Available components:', Object.keys(Livewire.all()));
                     }
-                });
+                }
 
-                // 🔍 DEBUG: Listen to ALL events on this channel
+                // 🔍 DEBUG: Listen to ALL events on this channel (fallback)
                 channel.listenToAll((eventName, data) => {
                     console.log('🔔 Received ANY event on channel:', channelName);
                     console.log('   Event name:', eventName);
                     console.log('   Event data:', data);
+                    
+                    // Fallback: Update component if event name contains 'TaskProgressUpdated'
+                    if (eventName.includes('TaskProgressUpdated')) {
+                        console.log('🔄 Fallback: Updating component via listenToAll');
+                        updateComponentState(data, componentId);
+                    }
                 });
 
-                console.log('✅ Event listener registered for TaskProgressUpdated');
+                console.log('✅ Event listeners registered for TaskProgressUpdated');
+                console.log('   Listening for multiple event name formats');
                 console.log('   Waiting for messages on channel:', channelName);
             });
 
