@@ -208,6 +208,13 @@
                     }
                 });
 
+                // 🔍 DEBUG: Listen to ALL events on this channel
+                channel.listenToAll((eventName, data) => {
+                    console.log('🔔 Received ANY event on channel:', channelName);
+                    console.log('   Event name:', eventName);
+                    console.log('   Event data:', data);
+                });
+
                 console.log('✅ Event listener registered for TaskProgressUpdated');
                 console.log('   Waiting for messages on channel:', channelName);
             });
