@@ -172,19 +172,19 @@
                 // Format 1: With namespace and dot prefix (Laravel Echo default)
                 channel.listen('.App.Events.TaskProgressUpdated', (data) => {
                     console.log('📨 Received event (format 1): .App.Events.TaskProgressUpdated');
-                    updateComponentState(data, component, componentId);
+                    updateComponentState(data, componentId);
                 });
 
                 // Format 2: Just the class name
                 channel.listen('TaskProgressUpdated', (data) => {
                     console.log('📨 Received event (format 2): TaskProgressUpdated');
-                    updateComponentState(data, component, componentId);
+                    updateComponentState(data, componentId);
                 });
 
                 // Format 3: With namespace but no dot
                 channel.listen('App.Events.TaskProgressUpdated', (data) => {
                     console.log('📨 Received event (format 3): App.Events.TaskProgressUpdated');
-                    updateComponentState(data, component, componentId);
+                    updateComponentState(data, componentId);
                 });
 
                 // Helper function to update component state
