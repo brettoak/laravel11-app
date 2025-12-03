@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class TaskProgressUpdated implements ShouldBroadcastNow
 {
@@ -33,6 +34,17 @@ class TaskProgressUpdated implements ShouldBroadcastNow
         $this->totalSteps = $totalSteps;
         $this->progress = $progress;
         $this->message = $message;
+
+        // Add debug logging
+        Log::info('TaskProgressUpdated event created', [
+            'taskId' => $taskId,
+            'currentStep' => $currentStep,
+            'totalSteps' => $totalSteps,
+            'progress' => $progress,
+            'message' => $message,
+            'channel' => "task-progress.{$taskId}",
+            'broadcast_driver' => config('broadcasting.default'),
+        ]);
     }
 
     /**
@@ -40,7 +52,14 @@ class TaskProgressUpdated implements ShouldBroadcastNow
      */
     public function broadcastOn(): PrivateChannel
     {
-        return new PrivateChannel("task-progress.{$this->taskId}");
+        $channel = new PrivateChannel("task-progress.{$this->taskId}");
+        
+        Log::info('Broadcasting on channel', [
+            'channel' => "task-progress.{$this->taskId}",
+            'event' => self::class,
+        ]);
+        
+        return $channel;
     }
 
     /**
@@ -57,13 +76,19 @@ class TaskProgressUpdated implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
-        return [
+        $data = [
             'taskId' => $this->taskId,
             'currentStep' => $this->currentStep,
             'totalSteps' => $this->totalSteps,
             'progress' => round($this->progress, 2),
             'message' => $this->message,
         ];
+
+        Log::info('Broadcasting data', [
+            'data' => $data,
+            'channel' => "task-progress.{$this->taskId}",
+        ]);
+
+        return $data;
     }
 }
-

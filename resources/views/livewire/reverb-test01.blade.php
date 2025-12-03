@@ -105,24 +105,33 @@
     <script>
         // Initialize when Livewire is ready
         document.addEventListener('livewire:init', () => {
-            console.log('Livewire initialized, setting up Echo listeners');
+            console.log('✓ Livewire initialized, setting up Echo listeners');
 
             // Ensure Echo is available
             if (typeof Echo === 'undefined') {
-                console.error('Echo is not defined. Please ensure Laravel Echo is loaded.');
+                console.error('✗ Echo is not defined. Please ensure Laravel Echo is loaded.');
                 return;
             }
+
+            console.log('✓ Echo is available:', {
+                connector: Echo.connector?.name || 'unknown',
+                options: {
+                    key: Echo.connector?.options?.key || 'not set',
+                    wsHost: Echo.connector?.options?.wsHost || 'not set',
+                    wsPort: Echo.connector?.options?.wsPort || 'not set',
+                }
+            });
 
             let channel = null;
 
             // Listen to Livewire events to start/stop listening
             Livewire.on('task-started', (event) => {
                 const taskId = event[0] || event.taskId;
-                console.log('Received task-started event, task ID:', taskId);
+                console.log('📢 Received task-started event, task ID:', taskId);
 
                 // Disconnect previous connection
                 if (channel) {
-                    console.log('Leaving previous channel:', channel.name);
+                    console.log('🔌 Leaving previous channel:', channel.name);
                     Echo.leave(channel.name);
                     channel = null;
                 }
@@ -132,70 +141,115 @@
                 const componentId = componentElement ? componentElement.getAttribute('wire:id') : null;
 
                 if (!componentId) {
-                    console.error('Component ID not found');
+                    console.error('✗ Component ID not found');
                     return;
                 }
 
-                console.log('Component ID:', componentId);
+                console.log('✓ Component ID:', componentId);
 
                 // Listen for progress updates of the new task
                 const channelName = `task-progress.${taskId}`;
-                console.log('Subscribing to channel:', channelName);
+                console.log('🔗 Subscribing to private channel:', channelName);
                 
                 channel = Echo.private(channelName);
 
                 // Add subscription success callback
                 channel.subscribed(() => {
-                    console.log('✓ Channel subscription successful:', channelName);
+                    console.log('✅ Channel subscription successful:', channelName);
+                    console.log('   Listening for event: .App.Events.TaskProgressUpdated');
                 });
 
                 // Add error callback
                 channel.error((error) => {
-                    console.error('✗ Channel subscription error:', error);
+                    console.error('❌ Channel subscription error:', error);
+                    console.error('   Channel:', channelName);
+                    console.error('   Error details:', JSON.stringify(error, null, 2));
                 });
 
                 // Listen for the TaskProgressUpdated event
                 // Laravel Echo automatically prepends a dot for namespaced events
                 channel.listen('.App.Events.TaskProgressUpdated', (data) => {
-                    console.log('✓ Received progress update:', data);
+                    console.log('📨 Received progress update event');
+                    console.log('   Channel:', channelName);
+                    console.log('   Data received:', JSON.stringify(data, null, 2));
 
                     const component = Livewire.find(componentId);
                     if (component) {
-                        console.log('Updating component state:', {
+                        console.log('🔄 Updating Livewire component...');
+                        console.log('   Component ID:', componentId);
+                        console.log('   Current state:', {
+                            currentStep: component.get('currentStep'),
+                            progress: component.get('progress'),
+                            message: component.get('message')
+                        });
+
+                        // Update component state
+                        component.set('currentStep', data.currentStep);
+                        component.set('progress', data.progress);
+                        component.set('message', data.message);
+
+                        console.log('✅ Component state updated:', {
                             currentStep: data.currentStep,
                             progress: data.progress,
                             message: data.message
                         });
 
-                        component.set('currentStep', data.currentStep);
-                        component.set('progress', data.progress);
-                        component.set('message', data.message);
-
                         // If task is completed, set running status to false
                         if (data.progress >= 100) {
                             setTimeout(() => {
                                 component.set('isRunning', false);
-                                console.log('Task completed, set isRunning to false');
+                                console.log('✅ Task completed, set isRunning to false');
                             }, 1000);
                         }
                     } else {
-                        console.error('Unable to find Livewire component, ID:', componentId);
+                        console.error('❌ Unable to find Livewire component');
+                        console.error('   Component ID:', componentId);
+                        console.error('   Available components:', Object.keys(Livewire.all()));
                     }
                 });
 
-                console.log('✓ Event listener registered for TaskProgressUpdated');
+                console.log('✅ Event listener registered for TaskProgressUpdated');
+                console.log('   Waiting for messages on channel:', channelName);
             });
 
             // Listen to reset event
             Livewire.on('task-reset', () => {
                 if (channel) {
-                    console.log('Disconnecting from channel:', channel.name);
+                    console.log('🔌 Disconnecting from channel:', channel.name);
                     Echo.leave(channel.name);
                     channel = null;
+                    console.log('✅ Channel disconnected');
                 }
             });
 
-            console.log('✓ Livewire event listeners registered');
+            console.log('✅ Livewire event listeners registered');
         });
+
+        // Add global error handler for debugging
+        window.addEventListener('error', (event) => {
+            console.error('🚨 Global error:', event.error);
+        });
+
+        // Log WebSocket connection status
+        if (typeof Echo !== 'undefined' && Echo.connector) {
+            Echo.connector.pusher.connection.bind('state_change', (states) => {
+                console.log('🔌 WebSocket state change:', {
+                    previous: states.previous,
+                    current: states.current
+                });
+            });
+
+            Echo.connector.pusher.connection.bind('connected', () => {
+                console.log('✅ WebSocket connected');
+            });
+
+            Echo.connector.pusher.connection.bind('disconnected', () => {
+                console.warn('⚠️ WebSocket disconnected');
+            });
+
+            Echo.connector.pusher.connection.bind('error', (error) => {
+                console.error('❌ WebSocket error:', error);
+            });
+        }
     </script>
 @endpush
