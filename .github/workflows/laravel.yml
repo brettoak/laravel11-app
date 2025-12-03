@@ -27,8 +27,21 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # 3.5. Create .env file for Vite build
+      - name: Create .env for Vite
+        run: |
+          echo "VITE_REVERB_APP_KEY=${{ secrets.VITE_REVERB_APP_KEY }}" >> .env
+          echo "VITE_REVERB_HOST=${{ secrets.VITE_REVERB_HOST }}" >> .env
+          echo "VITE_REVERB_PORT=${{ secrets.VITE_REVERB_PORT }}" >> .env
+          echo "VITE_REVERB_SCHEME=${{ secrets.VITE_REVERB_SCHEME }}" >> .env
+
       # 4. Build front-end assets
       - name: Build Frontend (Vite)
+        env:
+          VITE_REVERB_APP_KEY: ${{ secrets.VITE_REVERB_APP_KEY }}
+          VITE_REVERB_HOST: ${{ secrets.VITE_REVERB_HOST }}
+          VITE_REVERB_PORT: ${{ secrets.VITE_REVERB_PORT }}
+          VITE_REVERB_SCHEME: ${{ secrets.VITE_REVERB_SCHEME }}
         run: |
           if [ -f package.json ]; then
             npm install

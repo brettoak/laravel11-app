@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Broadcast;
 use App\Events\TaskProgressUpdated;
+use Illuminate\Support\Facades\Log;
 
 class ProcessTaskJob implements ShouldQueue
 {
@@ -35,10 +36,14 @@ class ProcessTaskJob implements ShouldQueue
         for ($currentStep = 1; $currentStep <= $this->totalSteps; $currentStep++) {
             // Simulate time-consuming operation for each step
             $this->simulateWork($currentStep);
-            
+
             // Calculate progress percentage
             $progress = ($currentStep / $this->totalSteps) * 100;
-            
+
+            Log::info("Task {$this->taskId}
+            - Step {$currentStep}/{$this->totalSteps}
+            completed. Progress: {$progress}%");
+
             // Broadcast progress update event
             event(new TaskProgressUpdated(
                 $this->taskId,
@@ -48,7 +53,7 @@ class ProcessTaskJob implements ShouldQueue
                 $this->getStatusMessage($currentStep)
             ));
         }
-        
+
         // Task completed
         event(new TaskProgressUpdated(
             $this->taskId,
