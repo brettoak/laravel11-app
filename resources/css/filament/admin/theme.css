@@ -2,6 +2,7 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/livewire/**/*';
 
 /* 定义自定义深色颜色变量 */
 :root {
@@ -14,15 +15,51 @@
    ------------------------------------------------------------ */
 
 @layer base {
+
     /* Global background adjustment */
     body {
-        @apply bg-slate-50 dark:bg-[#141414];
+        background-color: rgb(248 250 252);
+    }
+
+    :is(.dark body) {
+        background-color: #141414;
+    }
+}
+
+/* UI Structure Enhancements (Standard CSS for Tailwind v4 compatibility) */
+@layer components {
+
+    /* Sidebar Border */
+    .fi-sidebar {
+        border-right: 1px solid rgb(229 231 235);
+        /* gray-200 */
+    }
+
+    :is(.dark .fi-sidebar) {
+        border-right: 1px solid #262626;
+        /* neutral-800 */
+        background-color: #141414;
+        /* Match body bg */
+    }
+
+    /* Topbar Border */
+    .fi-topbar {
+        border-bottom: 1px solid rgb(229 231 235);
+        /* gray-200 */
+    }
+
+    :is(.dark .fi-topbar) {
+        border-bottom: 1px solid #262626;
+        /* neutral-800 */
+        background-color: rgba(20, 20, 20, 0.8);
+        /* Semi-transparent */
+        backdrop-filter: blur(12px);
     }
 }
 
 @layer utilities {
-    /* 1. Scrollbar Customization */
-    ::-webkit-scrollbar {
+    /* Scrollbar styles commented out due to Tailwind v4 compatibility */
+    /* ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
     }
@@ -31,91 +68,99 @@
     }
     ::-webkit-scrollbar-thumb {
         @apply bg-slate-300 dark:bg-[#2a2a2a] rounded-full hover:bg-slate-400 dark:hover:bg-[#3a3a3a] transition-colors;
-    }
+    } */
 }
 
 @layer components {
-    /* 2. Card & Container Optimization */
+    /* Filament custom theme styles commented out due to Tailwind v4 @apply dark: incompatibility */
+    /* These styles are not needed for the Livewire component */
+    /*
     .fi-section,
     .fi-wi-stats-overview-stat,
     .fi-ta-ctn {
-        @apply !shadow-sm !ring-1 !ring-slate-200/50 dark:!ring-[#2a2a2a] !rounded-xl dark:!bg-[#0a0a0a];
+        @apply !shadow-sm !ring-1 !ring-slate-200/50 dark: !ring-[#2a2a2a] !rounded-xl dark: !bg-[#0a0a0a];
     }
 
-    /* 3. Sidebar Optimization */
     .fi-sidebar {
-        @apply !border-r !border-slate-200 dark:!border-[#2a2a2a] bg-stone-50 dark:bg-[#141414] !backdrop-blur-md;
+        @apply !border-r !border-slate-200 dark: !border-[#2a2a2a] bg-stone-50 dark:bg-[#141414] !backdrop-blur-md;
     }
 
     .fi-sidebar-nav {
         @apply gap-y-1;
     }
 
-    /* Sidebar active item highlighting */
     .fi-sidebar-item-active a {
-        @apply !bg-primary-50 dark:!bg-[#1a1a1a] !text-primary-600 dark:!text-primary-400 !font-semibold;
+        @apply !bg-primary-50 dark: !bg-[#1a1a1a] !text-primary-600 dark: !text-primary-400 !font-semibold;
     }
 
-    /* Sidebar items text color */
     .fi-sidebar-item a {
-        @apply dark:!text-slate-300;
+        @apply dark: !text-slate-300;
     }
 
-    /* 4. Input Optimization */
-    .fi-input, .fi-select-input {
-        @apply !shadow-none !bg-white dark:!bg-[#0a0a0a] !text-slate-900 dark:!text-slate-100 dark:!border-[#2a2a2a] transition-all duration-200;
+    .fi-input,
+    .fi-select-input {
+        @apply !shadow-none !bg-white dark: !bg-[#0a0a0a] !text-slate-900 dark: !text-slate-100 dark: !border-[#2a2a2a] transition-all duration-200;
     }
 
-    /* Input focus ring */
     :is(.fi-input-wrp:focus-within) {
-        @apply !ring-2 !ring-primary-500/20 dark:!ring-primary-400/20 !border-primary-500 dark:!border-primary-400;
+        @apply !ring-2 !ring-primary-500/20 dark: !ring-primary-400/20 !border-primary-500 dark: !border-primary-400;
     }
 
-    /* 5. Button Optimization */
     .fi-btn {
         @apply !rounded-lg transition-transform active:scale-95;
     }
 
     .fi-btn-primary {
-        @apply !shadow-lg hover:!shadow-primary-500/30 dark:hover:!shadow-primary-500/20;
+        @apply !shadow-lg hover: !shadow-primary-500/30 dark:hover: !shadow-primary-500/20;
         box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2) !important;
     }
 
-    /* 6. Table Optimization */
     .fi-ta-header-cell {
-        @apply !text-slate-500 dark:!text-slate-400 !font-medium uppercase tracking-wider !text-xs;
+        @apply !text-slate-500 dark: !text-slate-400 !font-medium uppercase tracking-wider !text-xs;
     }
 
     .fi-ta-row {
-        @apply dark:!border-[#2a2a2a] dark:!bg-[#0a0a0a];
+        @apply dark: !border-[#2a2a2a] dark: !bg-[#0a0a0a];
     }
 
     .fi-ta-row:hover {
-        @apply !bg-slate-50 dark:!bg-[#141414] transition-colors;
+        @apply !bg-slate-50 dark: !bg-[#141414] transition-colors;
     }
 
-    /* 7. Topbar */
     .fi-topbar {
-        @apply !bg-white/80 dark:!bg-[#141414]/95 !backdrop-blur-md !border-b !border-slate-100 dark:!border-[#2a2a2a] !shadow-sm;
+        @apply !bg-white/80 dark: !bg-[#141414]/95 !backdrop-blur-md !border-b !border-slate-100 dark: !border-[#2a2a2a] !shadow-sm;
     }
 
-    /* 8. Text Color Adjustments */
-    .fi-topbar, .fi-sidebar {
-        @apply !text-slate-900 dark:!text-slate-50;
+    .fi-topbar,
+    .fi-sidebar {
+        @apply !text-slate-900 dark: !text-slate-50;
     }
 
-    /* 9. Modal & Dropdown */
     .fi-modal-heading {
-        @apply dark:!text-white;
+        @apply dark: !text-white;
     }
 
-    /* Dropdown menu */
     .fi-dropdown-menu {
-        @apply dark:!bg-[#141414] dark:!border-[#2a2a2a];
+        @apply dark: !bg-[#141414] dark: !border-[#2a2a2a];
     }
 
-    /* 10. Badge & Tags */
     .fi-badge {
-        @apply dark:!bg-[#1a1a1a] dark:!text-slate-200;
+        @apply dark: !bg-[#1a1a1a] dark: !text-slate-200;
+    }
+    */
+
+    /* 11. Custom Animations */
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    .animate-shimmer {
+        animation: shimmer 2s infinite;
     }
 }
