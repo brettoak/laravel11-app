@@ -24,10 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        app(Spatie\Permission\PermissionRegistrar::class)
+        app(\Spatie\Permission\PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)
             ->setRoleClass(Role::class);
-
-        //
     }
 }
