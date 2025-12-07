@@ -174,6 +174,65 @@
         @endif
     </div>
 
+    <!-- Toast Notifications -->
+    <div 
+        x-data="{
+            notifications: [],
+            add(type, message) {
+                const id = Date.now();
+                this.notifications.push({ id, type, message });
+                setTimeout(() => this.remove(id), 5000);
+            },
+            remove(id) {
+                this.notifications = this.notifications.filter(n => n.id !== id);
+            }
+        }"
+        @notify.window="add($event.detail.type, $event.detail.message)"
+        class="fixed top-24 right-6 z-[60] space-y-3 pointer-events-none"
+    >
+        <template x-for="notification in notifications" :key="notification.id">
+            <div 
+                class="pointer-events-auto min-w-[300px] max-w-sm rounded-xl shadow-2xl p-4 transform transition-all duration-300 backdrop-blur-xl border"
+                :class="{
+                    'bg-white/95 dark:bg-gray-800/95 border-emerald-500/50 text-emerald-600 dark:text-emerald-400': notification.type === 'success',
+                    'bg-white/95 dark:bg-gray-800/95 border-red-500/50 text-red-600 dark:text-red-400': notification.type === 'error',
+                    'bg-white/95 dark:bg-gray-800/95 border-amber-500/50 text-amber-600 dark:text-amber-400': notification.type === 'warning',
+                    'bg-white/95 dark:bg-gray-800/95 border-blue-500/50 text-blue-600 dark:text-blue-400': notification.type === 'info'
+                }"
+                x-transition:enter="translate-x-full opacity-0"
+                x-transition:enter-end="translate-x-0 opacity-100"
+                x-transition:leave="translate-x-full opacity-0"
+            >
+                <div class="flex items-start gap-3">
+                    <!-- Icons -->
+                    <div class="flex-shrink-0 mt-0.5">
+                        <template x-if="notification.type === 'success'">
+                            <svg class="w-5 h-5 bg-emerald-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </template>
+                        <template x-if="notification.type === 'error'">
+                            <svg class="w-5 h-5 bg-red-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </template>
+                        <template x-if="notification.type === 'warning'">
+                            <svg class="w-5 h-5 bg-amber-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </template>
+                        <template x-if="notification.type === 'info'">
+                            <svg class="w-5 h-5 bg-blue-100 rounded-full p-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </template>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm capitalize" x-text="notification.type"></h4>
+                        <p class="text-sm mt-0.5 text-gray-600 dark:text-gray-300" x-text="notification.message"></p>
+                    </div>
+
+                    <button @click="remove(notification.id)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+
     <!-- Floating Progress Window (Bottom Right) -->
     @if(count($jobs) > 0)
         <div
@@ -444,8 +503,14 @@
             Livewire.on('notification', (data) => {
                 const notification = data[0] || data;
                 console.log('🔔 Notification:', notification);
-                // Simple alert for now, can be replaced with a toast library
-                alert(`${notification.type.toUpperCase()}: ${notification.message}`);
+                
+                // Dispatch event for Alpine.js toast
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { 
+                        type: notification.type, 
+                        message: notification.message 
+                    } 
+                }));
             });
 
             // Helper function to update job progress
