@@ -15,7 +15,7 @@ class ReverbSingleJob extends Page
 
     public static function getNavigationBadge(): ?string
     {
-        return "New";
+        return "";
     }
 
     public static function getNavigationIcon(): string

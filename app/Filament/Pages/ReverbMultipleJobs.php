@@ -13,6 +13,12 @@ class ReverbMultipleJobs extends Page
         return 'heroicon-o-queue-list';
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        return 'New';
+    }
+
+
     public function getTitle(): string
     {
         return 'Job Progress Real-time Monitoring(Multiple Jobs)';
