@@ -1,8 +1,10 @@
 <div class="max-w-full mx-auto" id="reverb-multiple-jobs-component">
     <!-- Main Control Panel -->
-    <div class="relative overflow-hidden rounded-2xl shadow-2xl backdrop-blur-xl bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-800/95 dark:to-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 p-8">
-        <!-- Decorative gradient overlay -->
-        <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full blur-3xl -z-10"></div>
+    <div class="relative rounded-2xl shadow-2xl backdrop-blur-xl bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-800/95 dark:to-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 p-8">
+        <!-- Decorative gradient overlay (contained) -->
+        <div class="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none -z-10">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full blur-3xl"></div>
+        </div>
 
         <!-- Header -->
         <div class="mb-8">
