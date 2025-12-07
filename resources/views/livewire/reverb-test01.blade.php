@@ -3,8 +3,6 @@
     <div class="relative overflow-hidden rounded-2xl shadow-2xl backdrop-blur-xl bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-800/95 dark:to-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 p-8">
         <!-- Decorative gradient overlay -->
         <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full blur-3xl -z-10"></div>
-        
-        <h2 class="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Job Progress Real-time Monitoring</h2>
 
         <!-- Task information card with modern styling -->
         <div class="mb-8 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-100 dark:border-blue-800/30 backdrop-blur-sm">
@@ -200,7 +198,7 @@
                 // Listen for progress updates of the new task
                 const channelName = `task-progress.${taskId}`;
                 console.log('🔗 Subscribing to private channel:', channelName);
-                
+
                 channel = Echo.private(channelName);
 
                 // Add subscription success callback
@@ -218,7 +216,7 @@
 
                 // Listen for the TaskProgressUpdated event
                 // Try multiple event name formats to ensure compatibility
-                
+
                 // Format 1: With namespace and dot prefix (Laravel Echo default)
                 channel.listen('.App.Events.TaskProgressUpdated', (data) => {
                     console.log('📨 Received event (format 1): .App.Events.TaskProgressUpdated');
@@ -281,7 +279,7 @@
                     console.log('🔔 Received ANY event on channel:', channelName);
                     console.log('   Event name:', eventName);
                     console.log('   Event data:', data);
-                    
+
                     // Fallback: Update component if event name contains 'TaskProgressUpdated'
                     if (eventName.includes('TaskProgressUpdated')) {
                         console.log('🔄 Fallback: Updating component via listenToAll');

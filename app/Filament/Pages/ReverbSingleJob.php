@@ -25,6 +25,6 @@ class ReverbSingleJob extends Page
 
     public function getTitle(): string
     {
-        return "";
+        return "Job Progress Real-time Monitoring(Single Job)";
     }
 }
