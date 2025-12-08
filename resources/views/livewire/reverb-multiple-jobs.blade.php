@@ -1,4 +1,33 @@
-<div class="max-w-full mx-auto" id="reverb-multiple-jobs-component">
+<div class="max-w-full mx-auto" id="reverb-multiple-jobs-component"
+    x-data="{
+        jobs: @entangle('jobs'),
+        jobStates: {},
+        
+        get activeJobsList() {
+             // Convert jobs object to array and merge with local state
+             return Object.values(this.jobs).map(job => {
+                const local = this.jobStates[job.id] || {};
+                
+                // If the job is already marked as not running by the server, trust the server
+                if (!job.isRunning) return job;
+
+                // Otherwise merge local state (progress, message, currentStep)
+                return { ...job, ...local };
+            }).sort((a, b) => {
+                // Sort by creation time desc
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+        },
+
+        get runningCount() {
+            return this.activeJobsList.filter(j => j.isRunning).length;
+        },
+
+        get completedCount() {
+            return this.activeJobsList.filter(j => j.progress >= 100).length;
+        }
+    }"
+>
     <!-- Main Control Panel -->
     <div class="relative rounded-2xl shadow-2xl backdrop-blur-xl bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-800/95 dark:to-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 p-8">
         <!-- Decorative gradient overlay (contained) -->
@@ -17,7 +46,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-1">Total Jobs</p>
-                        <p class="text-3xl font-bold text-blue-700 dark:text-blue-300">{{ count($jobs) }}</p>
+                        <p class="text-3xl font-bold text-blue-700 dark:text-blue-300" x-text="Object.keys(jobs).length"></p>
                     </div>
                     <div class="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center">
                         <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,9 +60,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-semibold text-green-600 dark:text-green-400 mb-1">Running</p>
-                        <p class="text-3xl font-bold text-green-700 dark:text-green-300">
-                            {{ collect($jobs)->where('isRunning', true)->count() }}
-                        </p>
+                        <p class="text-3xl font-bold text-green-700 dark:text-green-300" x-text="runningCount"></p>
                     </div>
                     <div class="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
                         <svg class="w-8 h-8 text-green-600 dark:text-green-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,9 +74,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-1">Completed</p>
-                        <p class="text-3xl font-bold text-purple-700 dark:text-purple-300">
-                            {{ collect($jobs)->where('progress', '>=', 100)->count() }}
-                        </p>
+                        <p class="text-3xl font-bold text-purple-700 dark:text-purple-300" x-text="completedCount"></p>
                     </div>
                     <div class="w-14 h-14 rounded-full bg-purple-500/20 flex items-center justify-center">
                         <svg class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +186,7 @@
         </div>
 
         <!-- Empty State -->
-        @if(count($jobs) === 0)
+        <div x-show="Object.keys(jobs).length === 0" style="display: none;">
             <div class="mt-12 text-center py-16">
                 <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 mb-6">
                     <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +196,7 @@
                 <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">No active tasks</h3>
                 <p class="text-gray-500 dark:text-gray-400">Click "New Task" to get started</p>
             </div>
-        @endif
+        </div>
     </div>
 
     <!-- Toast Notifications -->
@@ -234,134 +259,142 @@
     </div>
 
     <!-- Floating Progress Window (Bottom Right) -->
-    @if(count($jobs) > 0)
-        <div
-            class="fixed bottom-6 right-6 w-96 max-h-[600px] overflow-hidden rounded-2xl shadow-2xl backdrop-blur-xl bg-white/95 dark:bg-gray-800/95 border border-gray-200/50 dark:border-gray-700/50 z-50 transition-all duration-300"
-            x-data="{ expanded: true }"
-        >
-            <!-- Header -->
-            <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-between cursor-pointer" @click="expanded = !expanded">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Active Tasks</h3>
-                        <p class="text-xs text-white/80">{{ count($jobs) }} tasks running</p>
-                    </div>
-                </div>
-                <button class="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                    <svg
-                        class="w-5 h-5 transition-transform duration-300"
-                        :class="expanded ? 'rotate-180' : ''"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    <div
+        x-show="Object.keys(jobs).length > 0"
+        style="display: none;"
+        class="fixed bottom-6 right-6 w-96 max-h-[600px] overflow-hidden rounded-2xl shadow-2xl backdrop-blur-xl bg-white/95 dark:bg-gray-800/95 border border-gray-200/50 dark:border-gray-700/50 z-50 transition-all duration-300"
+        x-data="{ expanded: true }"
+    >
+        <!-- Header -->
+        <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-between cursor-pointer" @click="expanded = !expanded">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
-                </button>
-                <!-- Debug Indicator -->
-                <div class="hidden">Debug: {{ count($jobs) }} jobs</div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">Active Tasks</h3>
+                    <p class="text-xs text-white/80"><span x-text="runningCount"></span> tasks running</p>
+                </div>
             </div>
+            <button class="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <svg
+                    class="w-5 h-5 transition-transform duration-300"
+                    :class="expanded ? 'rotate-180' : ''"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+        </div>
 
-            <!-- Jobs List -->
-            <div
-                class="overflow-y-auto max-h-[500px] custom-scrollbar"
-                x-show="expanded"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform -translate-y-2"
-                x-transition:enter-end="opacity-100 transform translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 transform translate-y-0"
-                x-transition:leave-end="opacity-0 transform -translate-y-2"
-            >
-                <div class="p-4 space-y-3">
-                    @foreach($jobs as $taskId => $job)
-                        <div
-                            wire:key="{{ $taskId }}"
-                            class="group p-4 rounded-xl transition-all duration-300 {{ $job['isRunning'] ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 border-2 border-amber-300 dark:border-amber-700' : ($job['progress'] >= 100 ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-300 dark:border-green-700' : 'bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600') }}"
-                            data-task-id="{{ $taskId }}"
-                        >
-                            <!-- Job Header -->
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        @if($job['isRunning'])
-                                            <span class="flex h-2.5 w-2.5">
-                                                <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-amber-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                                            </span>
-                                        @elseif($job['progress'] >= 100)
-                                            <span class="flex h-2.5 w-2.5 bg-green-500 rounded-full"></span>
-                                        @else
-                                            <span class="flex h-2.5 w-2.5 bg-gray-400 rounded-full"></span>
-                                        @endif
-                                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">
-                                            Task #{{ substr($taskId, 0, 8) }}
+        <!-- Jobs List -->
+        <div
+            class="overflow-y-auto max-h-[500px] custom-scrollbar"
+            x-show="expanded"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+        >
+            <div class="p-4 space-y-3">
+                <template x-for="job in activeJobsList" :key="job.id">
+                    <div
+                        class="group p-4 rounded-xl transition-all duration-300"
+                        :class="job.isRunning ? 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 border-2 border-amber-300 dark:border-amber-700' : (job.progress >= 100 ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-300 dark:border-green-700' : 'bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600')"
+                        :data-task-id="job.id"
+                    >
+                        <!-- Job Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <template x-if="job.isRunning">
+                                        <span class="flex h-2.5 w-2.5">
+                                            <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-amber-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                                         </span>
-                                    </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Created at {{ $job['createdAt'] }}</p>
-                                </div>
-                                <button
-                                    wire:click="removeJob('{{ $taskId }}')"
-                                    class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors group"
-                                    title="Remove task"
-                                >
-                                    <svg class="w-4 h-4 text-gray-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <!-- Progress Bar -->
-                            <div class="mb-2">
-                                <div class="flex justify-between items-center mb-1.5">
-                                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">Progress</span>
-                                    <span class="text-sm font-bold {{ $job['progress'] >= 100 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400' }}">
-                                        {{ number_format($job['progress'], 1) }}%
+                                    </template>
+                                    <template x-if="!job.isRunning && job.progress >= 100">
+                                        <span class="flex h-2.5 w-2.5 bg-green-500 rounded-full"></span>
+                                    </template>
+                                    <template x-if="!job.isRunning && job.progress < 100">
+                                        <span class="flex h-2.5 w-2.5 bg-gray-400 rounded-full"></span>
+                                    </template>
+                                    
+                                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                        Task #<span x-text="job.id.substring(0, 8)"></span>
                                     </span>
                                 </div>
-                                <div class="relative w-full bg-gray-200/50 dark:bg-gray-600/50 rounded-full h-2 overflow-hidden">
-                                    <div
-                                        class="h-full transition-all duration-700 ease-out rounded-full {{ $job['progress'] >= 100 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-amber-500 to-orange-500' }}"
-                                        style="width: {{ $job['progress'] }}%"
-                                    >
-                                        @if($job['isRunning'])
-                                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                                        @endif
-                                    </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Created at <span x-text="job.createdAt"></span></p>
+                            </div>
+                            <button
+                                wire:click="removeJob(job.id)"
+                                class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors group"
+                                title="Remove task"
+                            >
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="mb-2">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-xs font-semibold text-gray-600 dark:text-gray-300">Progress</span>
+                                <span 
+                                    class="text-sm font-bold"
+                                    :class="job.progress >= 100 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
+                                    x-text="Number(job.progress).toFixed(1) + '%'"
+                                ></span>
+                            </div>
+                            <div class="relative w-full bg-gray-200/50 dark:bg-gray-600/50 rounded-full h-2 overflow-hidden">
+                                <div
+                                    class="h-full transition-all duration-700 ease-out rounded-full"
+                                    :class="job.progress >= 100 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-amber-500 to-orange-500'"
+                                    :style="`width: ${job.progress}%`"
+                                >
+                                    <template x-if="job.isRunning">
+                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                                    </template>
                                 </div>
                             </div>
-
-                            <!-- Status Message -->
-                            <div class="flex items-center gap-2">
-                                @if($job['isRunning'])
-                                    <svg class="w-3.5 h-3.5 text-amber-500 animate-spin flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                    </svg>
-                                @elseif($job['progress'] >= 100)
-                                    <svg class="w-3.5 h-3.5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                @endif
-                                <p class="text-xs {{ $job['isRunning'] ? 'text-amber-700 dark:text-amber-300' : ($job['progress'] >= 100 ? 'text-green-700 dark:text-green-300' : 'text-gray-600 dark:text-gray-400') }} truncate">
-                                    {{ $job['message'] }}
-                                </p>
-                            </div>
-
-                            <!-- Step Counter -->
-                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                Step: <span class="font-semibold">{{ $job['currentStep'] }}</span> / {{ $totalSteps }}
-                            </div>
                         </div>
-                    @endforeach
-                </div>
+
+                        <!-- Status Message -->
+                        <div class="flex items-center gap-2">
+                            <template x-if="job.isRunning">
+                                <svg class="w-3.5 h-3.5 text-amber-500 animate-spin flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                            </template>
+                            <template x-if="!job.isRunning && job.progress >= 100">
+                                <svg class="w-3.5 h-3.5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </template>
+                            
+                            <p 
+                                class="text-xs truncate"
+                                :class="job.isRunning ? 'text-amber-700 dark:text-amber-300' : (job.progress >= 100 ? 'text-green-700 dark:text-green-300' : 'text-gray-600 dark:text-gray-400')"
+                                x-text="job.message"
+                            ></p>
+                        </div>
+
+                        <!-- Step Counter -->
+                        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            Step: <span class="font-semibold" x-text="job.currentStep"></span> / {{ $totalSteps }}
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
-    @endif
+    </div>
 </div>
 
 @push('styles')
@@ -438,8 +471,8 @@
                 const componentElement = document.getElementById('reverb-multiple-jobs-component');
                 const componentId = componentElement ? componentElement.getAttribute('wire:id') : null;
 
-                if (!componentId) {
-                    console.error('✗ Component ID not found');
+                if (!componentElement) {
+                    console.error('✗ Component element not found');
                     return;
                 }
 
@@ -462,27 +495,36 @@
                 });
 
                 // Listen for progress updates
-                channel.listen('.App.Events.TaskProgressUpdated', (data) => {
+                // Note: We update local Alpine state for performance,
+                // and only sync with Livewire on completion to avoid race conditions.
+                const handleProgress = (data) => {
                     console.log('📨 Progress update for task:', taskId, data);
-                    updateJobProgress(taskId, data, componentId);
-                });
-
-                // Fallback listeners
-                channel.listen('TaskProgressUpdated', (data) => {
-                    updateJobProgress(taskId, data, componentId);
-                });
-
-                channel.listen('App.Events.TaskProgressUpdated', (data) => {
-                    updateJobProgress(taskId, data, componentId);
-                });
-
-                // Listen to all events (debug)
-                channel.listenToAll((eventName, data) => {
-                    console.log('🔔 Event on channel:', channelName, 'Event:', eventName);
-                    if (eventName.includes('TaskProgressUpdated')) {
-                        updateJobProgress(taskId, data, componentId);
+                    
+                    // Get Alpine component data
+                    const alpine = Alpine.$data(componentElement);
+                    if (!alpine) {
+                        console.error(' Alpine data not found');
+                        return;
                     }
-                });
+
+                    // Update local volatile state
+                    alpine.jobStates[taskId] = {
+                        progress: data.progress,
+                        currentStep: data.currentStep,
+                        message: data.message
+                    };
+
+                    // If completed, sync with server to persist state
+                    if (data.progress >= 100) {
+                        console.log('✅ Task completed, syncing with server:', taskId);
+                        Livewire.dispatch('mark-job-complete', { taskId: taskId, data: data });
+                    }
+                };
+
+                // Listen to specific event class
+                channel.listen('.App.Events.TaskProgressUpdated', handleProgress);
+                // Fallback
+                channel.listen('TaskProgressUpdated', handleProgress);
             });
 
             // Listen to task-removed event
@@ -497,6 +539,15 @@
                     activeChannels.delete(taskId);
                     console.log('✅ Disconnected from channel for task:', taskId);
                 }
+                
+                // Clean up local state
+                 const componentElement = document.getElementById('reverb-multiple-jobs-component');
+                 if (componentElement) {
+                     const alpine = Alpine.$data(componentElement);
+                     if (alpine && alpine.jobStates[taskId]) {
+                         delete alpine.jobStates[taskId];
+                     }
+                 }
             });
 
             // Listen to notifications
@@ -512,41 +563,6 @@
                     } 
                 }));
             });
-
-            // Helper function to update job progress
-            function updateJobProgress(taskId, data, componentId) {
-                console.log('🔄 Updating job progress:', taskId, data);
-
-                const component = Livewire.find(componentId);
-                if (!component) {
-                    console.error('❌ Component not found:', componentId);
-                    return;
-                }
-
-                // Get current jobs
-                const jobs = component.get('jobs');
-
-                if (jobs && jobs[taskId]) {
-                    // Update job data
-                    jobs[taskId].currentStep = data.currentStep;
-                    jobs[taskId].progress = data.progress;
-                    jobs[taskId].message = data.message;
-
-                    // Set running status
-                    if (data.progress >= 100) {
-                        jobs[taskId].isRunning = false;
-                    }
-
-                    // Update component
-                    component.set('jobs', jobs);
-
-                    console.log('✅ Job updated:', taskId, {
-                        currentStep: data.currentStep,
-                        progress: data.progress,
-                        message: data.message
-                    });
-                }
-            }
 
             console.log('✅ Multiple Jobs event listeners registered');
         });

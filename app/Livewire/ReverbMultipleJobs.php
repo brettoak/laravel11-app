@@ -146,19 +146,16 @@ class ReverbMultipleJobs extends Component
     }
 
     /**
-     * Update job progress (called from JavaScript)
+     * Mark a job as complete (called from JavaScript)
      */
-    #[On('update-job-progress')]
-    public function updateJobProgress($taskId, $data): void
+    #[On('mark-job-complete')]
+    public function markJobComplete($taskId, $data): void
     {
         if (isset($this->jobs[$taskId])) {
             $this->jobs[$taskId]['currentStep'] = $data['currentStep'];
-            $this->jobs[$taskId]['progress'] = $data['progress'];
+            $this->jobs[$taskId]['progress'] = 100;
             $this->jobs[$taskId]['message'] = $data['message'];
-            
-            if ($data['progress'] >= 100) {
-                $this->jobs[$taskId]['isRunning'] = false;
-            }
+            $this->jobs[$taskId]['isRunning'] = false;
         }
     }
 
