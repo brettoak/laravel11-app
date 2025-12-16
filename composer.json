@@ -13,6 +13,7 @@
         "laravel/jetstream": "^5.3",
         "laravel/reverb": "^1.6",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.6.4",
         "predis/predis": "^3.3"
