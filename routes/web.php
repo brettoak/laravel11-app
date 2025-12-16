@@ -23,6 +23,21 @@ Route::get('/test2', static function () {
     ]);
 });
 
+Route::get('/login/github', static function () {
+    return Socialite::driver('github')->redirect();
+});
+
+Route::get('/login/github/callback', static function () {
+    return response()->json([
+        'message' => 'test2',
+        'code' => 200,
+        'data' => [
+            'name' => 'test2',
+            'age' => 20,
+        ],
+    ]);
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
