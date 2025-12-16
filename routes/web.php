@@ -3,6 +3,7 @@
 use App\Http\Controllers\Conversation;
 use App\Http\Controllers\ReverbMultipleJobs;
 use App\Http\Controllers\ReverbSingleJob;
+use App\Http\Controllers\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 
@@ -23,8 +24,8 @@ Route::get('/test2', static function () {
     ]);
 });
 
-Route::get('/login/github', [App\Http\Controllers\SocialAuthController::class, 'redirectToGithub'])->name('login.github');
-Route::get('/login/github/callback', [App\Http\Controllers\SocialAuthController::class, 'handleGithubCallback']);
+Route::get('/login/github', [SocialAuthController::class, 'redirectToGithub'])->name('login.github');
+Route::get('/login/github/callback', [SocialAuthController::class, 'handleGithubCallback']);
 
 Route::middleware([
     'auth:sanctum',

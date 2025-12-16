@@ -19,6 +19,8 @@ class SocialAuthController extends Controller
         try {
             $githubUser = Socialite::driver('github')->user();
 
+//            dd($githubUser);
+
             $user = User::where('github_id', $githubUser->id)
                 ->orWhere('email', $githubUser->email)
                 ->first();
@@ -29,22 +31,18 @@ class SocialAuthController extends Controller
                     'github_token' => $githubUser->token,
                 ]);
 
-                Auth::login($user);
-
-                return redirect()->intended('/dashboard');
             } else {
                 $user = User::create([
                     'name' => $githubUser->name ?? $githubUser->nickname,
-                    'email' => $githubUser->email,
+                    'email' => $githubUser->email ?? "{$githubUser->getId()}@github.com",
                     'github_id' => $githubUser->id,
                     'github_token' => $githubUser->token,
                     'password' => bcrypt(str()->random(16)), // Dummy password
                 ]);
 
-                Auth::login($user);
-
-                return redirect()->intended('/dashboard');
             }
+            Auth::login($user);
+            return redirect()->intended('/admin');
         } catch (\Exception $e) {
             return redirect('/login')->with('status', 'Login with GitHub failed. Please try again.');
         }
