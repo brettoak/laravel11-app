@@ -47,4 +47,41 @@ class SocialAuthController extends Controller
             return redirect('/login')->with('status', 'Login with GitHub failed. Please try again.');
         }
     }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            $user = User::where('google_id', $googleUser->id)
+                ->orWhere('email', $googleUser->email)
+                ->first();
+
+            if ($user) {
+                $user->update([
+                    'google_id' => $googleUser->id,
+                    'google_token' => $googleUser->token,
+                ]);
+
+            } else {
+                $user = User::create([
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'google_id' => $googleUser->id,
+                    'google_token' => $googleUser->token,
+                    'password' => bcrypt(str()->random(16)), // Dummy password
+                ]);
+
+            }
+            Auth::login($user);
+            return redirect()->intended('/admin');
+        } catch (\Exception $e) {
+            return redirect('/login')->with('status', 'Login with Google failed. Please try again.');
+        }
+    }
 }
