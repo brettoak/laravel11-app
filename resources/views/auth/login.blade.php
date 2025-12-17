@@ -63,6 +63,16 @@
                         </svg>
                         <span>{{ __('Sign in with Github') }}</span>
                     </a>
+
+                    <a href="{{ route('login.google') }}" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-gray-200 rounded-xl shadow-sm text-sm font-semibold text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M23.766 12.2764c0-.882-.0828-1.728-.2387-2.5388H12.2V14.524h6.5021c-.2878 1.5034-1.1448 2.778-2.4277 3.6302v3.0125h3.9168c2.296-2.1158 3.6198-5.2325 3.6198-8.7903Z" fill="#4285F4"/>
+                            <path d="M12.2001 24.0008c3.2466 0 5.9763-1.0776 7.969-2.9152l-3.9168-3.0124c-1.084.7265-2.469 1.1578-4.0522 1.1578-3.132 0-5.7831-2.112-6.732-4.9602H1.4707v3.1256C3.4754 21.396 8.5284 24.0008 12.2001 24.0008Z" fill="#34A853"/>
+                            <path d="M5.4678 14.2708c-.2393-.7254-.374-1.5035-.374-2.3106 0-.8072.1347-1.5853.374-2.3106V6.524H1.4707C.652 8.169.1996 10.027.1996 12.0002c0 1.9732.4523 3.8312 1.271 5.4762l3.9972-3.1656Z" fill="#FBBC05"/>
+                            <path d="M12.2001 5.3788c1.7681 0 3.3514.6083 4.5986 1.8028l3.4373-3.4373C17.8488 1.488 15.263 .1996 12.2001.1996 8.5284.1996 3.4754 2.8044 1.4707 6.6438l3.9972 3.1656c.9489-2.8482 3.5999-4.9602 6.732-4.9602Z" fill="#EA4335"/>
+                        </svg>
+                        <span>{{ __('Sign in with Google') }}</span>
+                    </a>    
                 </div>
             </form>
 
