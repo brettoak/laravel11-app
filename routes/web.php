@@ -27,6 +27,9 @@ Route::get('/test2', static function () {
 Route::get('/login/github', [SocialAuthController::class, 'redirectToGithub'])->name('login.github');
 Route::get('/login/github/callback', [SocialAuthController::class, 'handleGithubCallback']);
 
+Route::get('/login/google', [SocialAuthController::class, 'redirectToGoogle'])->name        ('login.google');
+Route::get('/login/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
