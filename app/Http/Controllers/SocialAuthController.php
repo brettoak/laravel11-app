@@ -71,7 +71,7 @@ class SocialAuthController extends Controller
             } else {
                 $user = User::create([
                     'name' => $googleUser->name,
-                    'email' => $googleUser->email,
+                    'email' => $googleUser->email ?? "{$googleUser->getId()}@google.com",
                     'google_id' => $googleUser->id,
                     'google_token' => $googleUser->token,
                     'password' => bcrypt(str()->random(16)), // Dummy password
