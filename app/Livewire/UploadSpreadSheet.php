@@ -69,6 +69,8 @@ class UploadSpreadSheet extends Component
         }
 
         $reader->close();
+
+        $this->dispatch('spreadsheet-parsed', headers: $this->headers, rows: $this->rows);
     }
 
     public function clear()
