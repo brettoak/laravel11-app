@@ -14,7 +14,7 @@ class UploadSpreadSheet extends Page
     }
     public function getTitle(): string
     {
-        return 'Upload Spread Sheet';
+        return 'Upload Spread Sheet And Show';
     }
     protected string $view = 'filament.pages.upload-spread-sheet';
 }
