@@ -19,14 +19,14 @@ class UploadSpreadSheet extends Component
     public array $rows = [];
     public bool $isProcessing = false;
 
-    public function updatedFile()
+    public function updatedFile() : void
     {
         $this->validate([
             'file' => 'required|file|mimes:csv,xlsx,xls|max:10240', // 10MB max
         ]);
 
         $this->isProcessing = true;
-        
+
         try {
             $this->parseFile();
         } catch (\Exception $e) {
@@ -36,7 +36,7 @@ class UploadSpreadSheet extends Component
         }
     }
 
-    public function parseFile()
+    public function parseFile() : void
     {
         $path = $this->file->getRealPath();
         $extension = $this->file->getClientOriginalExtension();
@@ -56,7 +56,7 @@ class UploadSpreadSheet extends Component
         foreach ($reader->getSheetIterator() as $sheet) {
             foreach ($sheet->getRowIterator() as $row) {
                 $cells = $row->toArray();
-                
+
                 if (empty($this->headers)) {
                     $this->headers = $cells;
                 } else {
