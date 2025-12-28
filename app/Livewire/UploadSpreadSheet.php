@@ -17,6 +17,7 @@ class UploadSpreadSheet extends Component
     public $file;
     public array $headers = [];
     public bool $isProcessing = false;
+    public string $fileName = '';
 
     public function updatedFile() : void
     {
@@ -24,6 +25,7 @@ class UploadSpreadSheet extends Component
             'file' => 'required|file|mimes:csv,xlsx,xls|max:10240', // 10MB max
         ]);
 
+        $this->fileName = $this->file->getClientOriginalName();
         $this->isProcessing = true;
 
         try {
@@ -74,7 +76,7 @@ class UploadSpreadSheet extends Component
 
     public function clear()
     {
-        $this->reset(['file', 'headers', 'isProcessing']);
+        $this->reset(['file', 'headers', 'isProcessing', 'fileName']);
     }
 
     public function render() : View
