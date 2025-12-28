@@ -82,8 +82,8 @@
                 </div>
             @else
                 <!-- Data Preview -->
-                <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-inner">
-                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 flex justify-between items-center">
+                <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-inner flex flex-col h-[600px]">
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 flex justify-between items-center flex-shrink-0">
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                                 <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,43 +92,70 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-gray-800 dark:text-gray-200">Data Preview</h3>
-                                <p class="text-xs text-gray-500 font-medium">Showing first 100 rows</p>
+                                <p class="text-xs text-gray-500 font-medium">Showing first {{ count($rows) }} rows</p>
                             </div>
                         </div>
-                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-bold border border-blue-200 dark:border-blue-800">
-                            {{ count($rows) }} Rows
-                        </span>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-100/80 dark:bg-gray-700/80 dark:text-gray-300">
-                                <tr>
-                                    @foreach($headers as $header)
-                                        <th scope="col" class="px-6 py-4 font-bold border-b dark:border-gray-700 whitespace-nowrap">
-                                            {{ $header }}
-                                        </th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($rows as $row)
-                                    <tr class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                        @foreach($row as $cell)
-                                            <td class="px-6 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">
-                                                {{ $cell }}
-                                            </td>
-                                        @endforeach
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="{{ count($headers) }}" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                            No data rows found in this file.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <div 
+                        class="flex-1 w-full relative" 
+                        x-data="{
+                            initGrid() {
+                                let headers, rows;
+                                try {
+                                    headers = JSON.parse(this.$el.dataset.headers);
+                                    rows = JSON.parse(this.$el.dataset.rows);
+                                } catch (e) {
+                                    console.error('Failed to parse grid data', e);
+                                    return;
+                                }
+                                
+                                if (!headers || !headers.length) return;
+
+                                const colDefs = headers.map(header => ({
+                                    field: header,
+                                    filter: true,
+                                    sortable: true,
+                                    resizable: true
+                                }));
+
+                                const rowData = rows.map(row => {
+                                    const obj = {};
+                                    headers.forEach((header, index) => {
+                                        obj[header] = row[index] ?? '';
+                                    });
+                                    return obj;
+                                });
+
+                                const isDark = document.documentElement.classList.contains('dark');
+                                const themeClass = isDark ? 'ag-theme-quartz-dark' : 'ag-theme-quartz';
+                                this.$el.className = 'w-full h-full ' + themeClass;
+
+                                // Ensure window.createGrid is available (from app.js)
+                                if (window.createGrid) {
+                                    // destroy previous instance if exists to prevent duplicates on livewire updates
+                                    this.$el.innerHTML = '';
+                                    
+                                    window.createGrid(this.$el, {
+                                        columnDefs: colDefs,
+                                        rowData: rowData,
+                                        defaultColDef: {
+                                            flex: 1,
+                                            minWidth: 100,
+                                        },
+                                        pagination: true,
+                                        paginationPageSize: 20
+                                    });
+                                } else {
+                                    console.error('AG Grid createGrid function not found. Ensure resources/js/app.js is built.');
+                                }
+                            }
+                        }" 
+                        x-init="initGrid"
+                        data-headers='{{ json_encode($headers, JSON_HEX_APOS) }}'
+                        data-rows='{{ json_encode($rows, JSON_HEX_APOS) }}'
+                    >
+                        <!-- Grid Container -->
                     </div>
                 </div>
             @endif
