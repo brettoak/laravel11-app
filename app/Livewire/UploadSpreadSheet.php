@@ -16,7 +16,6 @@ class UploadSpreadSheet extends Component
 
     public $file;
     public array $headers = [];
-    public array $rows = [];
     public bool $isProcessing = false;
 
     public function updatedFile() : void
@@ -50,7 +49,7 @@ class UploadSpreadSheet extends Component
         $reader->open($path);
 
         $this->headers = [];
-        $this->rows = [];
+        $rows = [];
         $rowCount = 0;
 
         foreach ($reader->getSheetIterator() as $sheet) {
@@ -60,7 +59,7 @@ class UploadSpreadSheet extends Component
                 if (empty($this->headers)) {
                     $this->headers = $cells;
                 } else {
-                    $this->rows[] = $cells;
+                    $rows[] = $cells;
                     $rowCount++;
                 }
             }
@@ -70,12 +69,12 @@ class UploadSpreadSheet extends Component
 
         $reader->close();
 
-        $this->dispatch('spreadsheet-parsed', headers: $this->headers, rows: $this->rows);
+        $this->dispatch('spreadsheet-parsed', headers: $this->headers, rows: $rows);
     }
 
     public function clear()
     {
-        $this->reset(['file', 'headers', 'rows', 'isProcessing']);
+        $this->reset(['file', 'headers', 'isProcessing']);
     }
 
     public function render() : View
