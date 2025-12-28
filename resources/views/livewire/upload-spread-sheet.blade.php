@@ -112,8 +112,9 @@
                                 
                                 if (!headers || !headers.length) return;
 
-                                const colDefs = headers.map(header => ({
-                                    field: header,
+                                const colDefs = headers.map((header, index) => ({
+                                    field: `col_${index}`,
+                                    headerName: header || `Column ${index + 1}`,
                                     filter: true,
                                     sortable: true,
                                     resizable: true
@@ -121,8 +122,8 @@
 
                                 const rowData = rows.map(row => {
                                     const obj = {};
-                                    headers.forEach((header, index) => {
-                                        obj[header] = row[index] ?? '';
+                                    headers.forEach((_, index) => {
+                                        obj[`col_${index}`] = row[index] ?? '';
                                     });
                                     return obj;
                                 });
