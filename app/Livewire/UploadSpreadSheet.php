@@ -63,11 +63,6 @@ class UploadSpreadSheet extends Component
                     $this->rows[] = $cells;
                     $rowCount++;
                 }
-
-                // Limit preview to 100 rows
-                if ($rowCount >= 100) {
-                    break 2;
-                }
             }
             // Only read the first sheet
             break;
