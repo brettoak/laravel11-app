@@ -13,11 +13,6 @@ class UploadSpreadSheet extends Page
         return 'heroicon-o-arrow-up-circle';
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return 'New';
-    }
-    
     public function getTitle(): string
     {
         return 'Upload Spread Sheet And Show';
