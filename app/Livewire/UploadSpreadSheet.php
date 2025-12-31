@@ -77,6 +77,7 @@ class UploadSpreadSheet extends Component
     public function clear()
     {
         $this->reset(['file', 'headers', 'isProcessing', 'fileName']);
+        $this->dispatch('clear-grid');
     }
 
     public function render() : View
