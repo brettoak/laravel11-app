@@ -15,7 +15,7 @@ class UploadSpreadSheet extends Page
 
     public static function getNavigationBadge(): string
     {
-        return 'new';
+        return "";
     }
 
     public function getTitle(): string
