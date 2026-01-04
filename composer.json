@@ -9,6 +9,7 @@
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^4.0",
         "filament/filament": "~4.0",
+        "laragear/webauthn": "^4.0",
         "laravel/framework": "^11.31",
         "laravel/jetstream": "^5.3",
         "laravel/reverb": "^1.6",
