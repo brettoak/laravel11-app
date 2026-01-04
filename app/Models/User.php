@@ -14,7 +14,10 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
+use Laragear\WebAuthn\WebAuthnAuthentication;
+
+class User extends Authenticatable implements FilamentUser, WebAuthnAuthenticatable
 {
     use HasApiTokens;
 
@@ -24,6 +27,7 @@ class User extends Authenticatable implements FilamentUser
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
+    use WebAuthnAuthentication;
 
     /**
      * The attributes that are mass assignable.
