@@ -13,6 +13,13 @@ Route::redirect('/', '/login');
 
 Route::redirect('/admin/login', '/login');
 
+Route::group(['prefix' => 'webauthn'], function () {
+    Route::post('register/options', [\App\Http\Controllers\WebAuthn\WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options');
+    Route::post('register', [\App\Http\Controllers\WebAuthn\WebAuthnRegisterController::class, 'register'])->name('webauthn.register');
+    Route::post('login/options', [\App\Http\Controllers\WebAuthn\WebAuthnLoginController::class, 'options'])->name('webauthn.login.options');
+    Route::post('login', [\App\Http\Controllers\WebAuthn\WebAuthnLoginController::class, 'login'])->name('webauthn.login');
+});
+
 Route::get('/test2', static function () {
     return response()->json([
         'message' => 'test2',
