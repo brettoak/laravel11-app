@@ -9,7 +9,7 @@
 
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, scopes: $this->getRenderHookScopes()) }}
 
-    <x-filament-panels::form id="form" wire:submit="authenticate">
+    <form id="form" wire:submit="authenticate" class="space-y-8">
         {{ $this->form }}
 
         <x-filament::button type="submit" form="form" class="w-full">
@@ -44,7 +44,7 @@
         @once
             <script src="{{ asset('js/vendor/webauthn/webauthn.js') }}"></script>
         @endonce
-    </x-filament-panels::form>
+    </form>
 
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, scopes: $this->getRenderHookScopes()) }}
 </x-filament-panels::page.simple>
